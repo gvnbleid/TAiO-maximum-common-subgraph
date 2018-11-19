@@ -7,7 +7,7 @@ using Priority_Queue;
 
 namespace CliqueHeuristic
 {
-    internal class ModularGraph : Graph
+    public class ModularGraph : Graph
     {
         private readonly Graph _g, _h;
         public ModularGraph(Graph g, Graph h) : base(g.VertexCount * h.VertexCount)
@@ -60,12 +60,16 @@ namespace CliqueHeuristic
         public Tuple<HashSet<int>, HashSet<int>> LargestCliqueHeuristic(bool modeVerticesOnly)
         {
             var vertexDegrees = VertexDegrees();
+            var list = new LinkedList<CliqueNode>();
             var queue = new FastPriorityQueue<CliqueNode>(VertexCount);
             for (var i = 0; i < vertexDegrees.Length; i++)
-                queue.Enqueue(new CliqueNode(i, vertexDegrees[i]), vertexDegrees[i]);
+            {
+                var cliqueNode = new CliqueNode(i, vertexDegrees[i]);
+                list.AddLast(cliqueNode);
+                queue.Enqueue(cliqueNode, cliqueNode.VertexSmallestDegree);
+            }
             var unmergable = new bool[VertexCount, VertexCount];
-            var unmergableCount = VertexCount; // how many true values in 'unmergable', initialized with diagonal
-            while (unmergableCount < VertexCount * VertexCount)
+            while (true)
             {
                 CliqueNode node1 = queue.Dequeue(), node2 = null;
                 var unmergableWithNode1 = new LinkedList<CliqueNode>();
@@ -73,6 +77,13 @@ namespace CliqueHeuristic
                 {
                     if (node2 != null)
                         unmergableWithNode1.AddLast(node2);
+                    if (queue.Count <= 0)
+                    {
+                        // node1 is no more mergable with any of the elements in the queue
+                        foreach (var node in unmergableWithNode1)
+                            queue.Enqueue(node, node.VertexSmallestDegree);
+                        node1 = queue.Dequeue();
+                    }
                     node2 = queue.Dequeue();
                 } while (unmergable[node1.CliqueNumber, node2.CliqueNumber]);
                 foreach (var node in unmergableWithNode1)
@@ -83,9 +94,10 @@ namespace CliqueHeuristic
                     foreach (var node2Vertex in node2.Vertices)
                         if (!IsEdge(node1Vertex, node2Vertex))
                         {
+                            queue.Enqueue(node1, node1.VertexSmallestDegree);
+                            queue.Enqueue(node2, node2.VertexSmallestDegree);
                             unmergable[node1.CliqueNumber, node2.CliqueNumber] =
                                 unmergable[node2.CliqueNumber, node1.CliqueNumber] = true;
-                            unmergableCount += 2;
                             mergable = false;
                             break;
                         }
@@ -96,20 +108,23 @@ namespace CliqueHeuristic
                 {
                     node1.Vertices.UnionWith(node2.Vertices);
                     node1.VertexSmallestDegree = Math.Min(node1.VertexSmallestDegree, node2.VertexSmallestDegree);
+                    for(var i = 0; i < VertexCount; i++)
+                        unmergable[node1.CliqueNumber, i] |= unmergable[node2.CliqueNumber, i];
                     queue.Enqueue(node1, node1.VertexSmallestDegree);
                 }
+                break;
             }
             HashSet<int> clique = null;
             if (modeVerticesOnly)
             {
-                foreach (var cliqueNode in queue)
+                foreach (var cliqueNode in list)
                     if (clique == null || cliqueNode.Vertices.Count > clique.Count)
                         clique = cliqueNode.Vertices;
             }
             else
             {
                 var gEdgeCount = 0;
-                foreach (var cliqueNode in queue)
+                foreach (var cliqueNode in list)
                     if (clique == null)
                         clique = cliqueNode.Vertices;
                     else

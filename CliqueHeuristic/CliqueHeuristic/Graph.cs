@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Priority_Queue;
 
 namespace CliqueHeuristic
 {
-    internal class Graph
+    public class Graph
     {
         private bool[,] AdjacencyMatrix { get; }
 
@@ -36,6 +31,19 @@ namespace CliqueHeuristic
             // TODO: remove unnecessary check
             if (!IsCorrect())
                 throw new ArgumentException("Invalid input graph");
+        }
+        public override string ToString()
+        {
+            var result = "";
+            for (var i = 0; i < AdjacencyMatrix.GetLength(0); i++)
+                for (var j = i; j < AdjacencyMatrix.GetLength(1); j++)
+                    if (IsEdge(i, j))
+                    {
+                        if (result.Length > 0)
+                            result += ", ";
+                        result += "<" + i + ", " + j + ">";
+                    }
+            return result;
         }
         public void AddEdge(int from, int to)
         {
