@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,106 +10,65 @@ namespace CliqueHeuristic
 {
     internal class Graph
     {
-        public static bool[,] ModularProduct(bool[,] g, bool[,] h)
+        private bool[,] AdjacencyMatrix { get; }
+
+        public int VertexCount => AdjacencyMatrix.GetLength(0);
+
+        public int EdgeCount
         {
-            if (!IsCorrect(g) || !IsCorrect(h))
-                throw new ArgumentException("Invalid input graph");
-            var gSize = g.GetLength(0);
-            var hSize = h.GetLength(0);
-            var dim = gSize * hSize;
-            var product = new bool[dim, dim];
-            for (var i = 0; i < dim; i++)
-                for (var j = i; j < dim; j++)
-                    if (i / hSize == j / hSize || i % gSize == j % gSize)
-                        product[i, j] = false;
-                    else
-                        product[i, j] = product[j, i] = (g[i / hSize, j / hSize] && h[i % gSize, j % gSize]) ||
-                                                        (!g[i / hSize, j / hSize] && !h[i % gSize, j % gSize]);
-            return product;
-        }
-        private class CliqueNode : FastPriorityQueueNode
-        {
-            public int CliqueNumber { get; set; }
-            public int VertexSmallestDegree { get; set; }
-            public HashSet<int> Vertices = new HashSet<int>();
-            public CliqueNode(int v, int vertexSmallestDegree)
+            get
             {
-                CliqueNumber = v;
-                VertexSmallestDegree = vertexSmallestDegree;
-                Vertices.Add(v);
+                var count = 0;
+                for (var i = 0; i < AdjacencyMatrix.GetLength(0); i++)
+                    for (var j = i; j < AdjacencyMatrix.GetLength(1); j++)
+                        count++;
+                return count;
             }
         }
-        public static int[] Clique(bool[,] g, bool modeVerticesOnly)
+
+        public Graph(int size)
         {
-            if (!IsCorrect(g))
+            AdjacencyMatrix = new bool[size, size];
+        }
+        public Graph(bool[,] g)
+        {
+            AdjacencyMatrix = g.Clone() as bool[,];
+            // TODO: remove unnecessary check
+            if (!IsCorrect())
                 throw new ArgumentException("Invalid input graph");
-            var gSize = g.GetLength(0);
-            var vertexDegrees = new int[gSize];
-            for (var i = 0; i < vertexDegrees.Length; i++)
-                for (var j = 0; j < vertexDegrees.Length; j++)
-                    if (g[i, j])
-                        vertexDegrees[i]++;
-            var queue = new FastPriorityQueue<CliqueNode>(gSize);
-            for (var i = 0; i < vertexDegrees.Length; i++)
-                queue.Enqueue(new CliqueNode(i, vertexDegrees[i]), vertexDegrees[i]);
-            var unmergable = new bool[gSize, gSize];
-            var unmergableCount = gSize; // how many true values in 'unmergable', initialized with diagonal
-            while (unmergableCount < gSize * gSize)
+        }
+        public void AddEdge(int from, int to)
+        {
+            if(from < 0 || from >= VertexCount || to < 0 || to >= VertexCount)
+                throw new ArgumentException("Invalid edge");
+            AdjacencyMatrix[from, to] = AdjacencyMatrix[to, from] = true;
+        }
+        public bool IsEdge(int from, int to)
+        {
+            return AdjacencyMatrix[from, to];
+        }
+        public Graph Subgraph(HashSet<int> vertices)
+        {
+            var subgraph = new Graph(vertices.Count);
+            foreach (var v in vertices)
             {
-                CliqueNode node1 = queue.Dequeue(), node2 = null;
-                var unmergableWithNode1 = new LinkedList<CliqueNode>();
-                do
+                foreach (var w in vertices)
                 {
-                    if (node2 != null)
-                        unmergableWithNode1.AddLast(node2);
-                    node2 = queue.Dequeue();
-                } while (unmergable[node1.CliqueNumber, node2.CliqueNumber]);
-                foreach (var node in unmergableWithNode1)
-                    queue.Enqueue(node, node.VertexSmallestDegree);
-                var mergable = true;
-                foreach (var node1Vertex in node1.Vertices)
-                {
-                    foreach (var node2Vertex in node2.Vertices)
-                        if (!g[node1Vertex, node2Vertex])
-                        {
-                            unmergable[node1.CliqueNumber, node2.CliqueNumber] =
-                                unmergable[node2.CliqueNumber, node1.CliqueNumber] = true;
-                            unmergableCount += 2;
-                            mergable = false;
-                            break;
-                        }
-                    if (!mergable)
-                        break;
-                }
-                if (mergable)
-                {
-                    node1.Vertices.UnionWith(node2.Vertices);
-                    node1.VertexSmallestDegree = Math.Min(node1.VertexSmallestDegree, node2.VertexSmallestDegree);
-                    queue.Enqueue(node1, node1.VertexSmallestDegree);
+                    if(IsEdge(v, w))
+                        subgraph.AddEdge(v, w);
                 }
             }
-            HashSet<int> clique = null;
-            if (modeVerticesOnly)
-            {
-                foreach (var cliqueNode in queue)
-                    if (clique == null || cliqueNode.Vertices.Count > clique.Count)
-                        clique = cliqueNode.Vertices;
-            }
-            else
-            {
-                // TODO: wersja dla sumy wierzcholkow i krawedzi
-            }
-            return clique?.ToArray();
+            return subgraph;
         }
-        public static bool IsCorrect(bool[,] g)
+        public bool IsCorrect()
         {
-            if (g.GetLength(0) != g.GetLength(1))
+            if (AdjacencyMatrix.GetLength(0) != AdjacencyMatrix.GetLength(1))
                 return false;
-            for (var i = 0; i < g.GetLength(0); i++)
-                for (var j = i; j < g.GetLength(1); j++)
-                    if (j == i && g[i, j]) // loops
+            for (var i = 0; i < AdjacencyMatrix.GetLength(0); i++)
+                for (var j = i; j < AdjacencyMatrix.GetLength(1); j++)
+                    if (j == i && AdjacencyMatrix[i, j]) // loops
                         return false;
-                    else if (g[i, j] != g[j, i])
+                    else if (AdjacencyMatrix[i, j] != AdjacencyMatrix[j, i])
                         return false;
             return true;
         }
