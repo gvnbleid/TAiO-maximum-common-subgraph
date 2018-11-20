@@ -69,6 +69,7 @@ namespace CliqueHeuristic
                 queue.Enqueue(cliqueNode, cliqueNode.VertexSmallestDegree);
             }
             var unmergable = new bool[VertexCount, VertexCount];
+            var flag = true;
             while (true)
             {
                 CliqueNode node1 = queue.Dequeue(), node2 = null;
@@ -82,10 +83,18 @@ namespace CliqueHeuristic
                         // node1 is no more mergable with any of the elements in the queue
                         foreach (var node in unmergableWithNode1)
                             queue.Enqueue(node, node.VertexSmallestDegree);
+                        unmergableWithNode1.Clear();
+                        if (queue.Count <= 1)
+                        {
+                            flag = false;
+                            break;
+                        }
                         node1 = queue.Dequeue();
                     }
                     node2 = queue.Dequeue();
                 } while (unmergable[node1.CliqueNumber, node2.CliqueNumber]);
+                if (!flag)
+                    break;
                 foreach (var node in unmergableWithNode1)
                     queue.Enqueue(node, node.VertexSmallestDegree);
                 var mergable = true;
@@ -112,7 +121,6 @@ namespace CliqueHeuristic
                         unmergable[node1.CliqueNumber, i] |= unmergable[node2.CliqueNumber, i];
                     queue.Enqueue(node1, node1.VertexSmallestDegree);
                 }
-                break;
             }
             HashSet<int> clique = null;
             if (modeVerticesOnly)

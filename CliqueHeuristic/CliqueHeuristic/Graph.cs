@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CliqueHeuristic
 {
@@ -57,13 +58,18 @@ namespace CliqueHeuristic
         }
         public Graph Subgraph(HashSet<int> vertices)
         {
+            var verticesArray = vertices.ToArray();
+            var mapping = new int[VertexCount];
+            for (var i = 0; i < verticesArray.Length; i++)
+                mapping[verticesArray[i]] = i;
+
             var subgraph = new Graph(vertices.Count);
             foreach (var v in vertices)
             {
                 foreach (var w in vertices)
                 {
-                    if(IsEdge(v, w))
-                        subgraph.AddEdge(v, w);
+                    if (IsEdge(v, w))
+                        subgraph.AddEdge(mapping[v], mapping[w]);
                 }
             }
             return subgraph;
