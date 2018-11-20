@@ -10,7 +10,12 @@ namespace CliqueHeuristic
         {
             bool[,] gA, gB;
             if (args.Any())
-                GraphReader.readArgs(args, out gA, out gB);
+            {
+                if (!GraphReader.tryReadArgs(args, out gA, out gB))
+                {
+                    return;
+                }
+            }
             else
             {
                 gA = new[,]
@@ -34,11 +39,15 @@ namespace CliqueHeuristic
             Graph graphA = new Graph(gA), graphB = new Graph(gB);
             Console.WriteLine("Graph A edges: " + graphA);
             Console.WriteLine("Graph B edges: " + graphB);
+            Console.WriteLine();
 
             var modularGraph = new ModularGraph(graphA, graphB);
             var vertexModeResult = modularGraph.LargestCliqueHeuristic(true);
+            Console.WriteLine("Vertices count maximum subgraph:");
             Console.WriteLine(vertexModeResult.ConvertToString());
+            Console.WriteLine();
             var sumModeResult = modularGraph.LargestCliqueHeuristic(false);
+            Console.WriteLine("Vertices and edges sum maximum subgraph:");
             Console.WriteLine(sumModeResult.ConvertToString());
         }
     }
