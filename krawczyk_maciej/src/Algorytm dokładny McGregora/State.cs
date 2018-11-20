@@ -50,9 +50,13 @@ namespace TAIO_MCGREGOR
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(String.Format("Count of Verticles = {0}", correspondingVerticles.Count - countOfNullNodes));
             sb.AppendLine(String.Format("Count of Edges = {0}", countOfEdges));
+            sb.AppendLine("\n[Vertex from G1, vertex from G2]");
             foreach (var el in correspondingVerticles)
-                sb.Append(String.Format("[{0}, {1}]", el.Item1, el.Item2));
-            sb.AppendLine("");
+            {
+                if(el.Item2 != -1)
+                    sb.Append(String.Format("[{0}, {1}]", el.Item1, el.Item2));
+            }
+            sb.AppendLine("\n\n<Edge from G1> - <Edge from G2>");
             foreach (var el in correspondingEdges)
                 sb.AppendLine(el.Item1 + " - " + el.Item2);
             return sb.ToString();

@@ -24,19 +24,15 @@ namespace TAIO_MCGREGOR
                         //Console.WriteLine(" correct! {0}", s.correspondingVerticles.Count - s.countOfNullNodes);
                         s.AddNewPair(pair.Item1, pair.Item2, count);
                         checkMaxVE(s, ref max);
-                        if (!Program.LeafOfSearchTree(s, G1.GetLength(0)) 
-                            /*&& !PruningCondition(s, max, G1.GetLength(0))*/)
+                        if (!Program.LeafOfSearchTree(s, G1.GetLength(0)) && !PruningCondition(s, max, G1.GetLength(0)))
                             McGregor(s, G1, G2, ref max);
                         s.Backtrack(count);
                     }
                     count = 0;
                 }
             //case with null node
-            if (v1 == 0)
-                Console.Write("tell me");
             s.AddNewPair(v1, -1, 0);
-            if (!Program.LeafOfSearchTree(s, G1.GetLength(0)) 
-                /*&& !PruningCondition(s, max, G1.GetLength(0))*/)
+            if (!Program.LeafOfSearchTree(s, G1.GetLength(0)) && !PruningCondition(s, max, G1.GetLength(0)))
                 McGregor(s, G1, G2, ref max);
             s.Backtrack(0);
         }
