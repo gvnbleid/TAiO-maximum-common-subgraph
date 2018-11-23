@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Linq.Expressions;
-using System.Drawing;
-namespace TAIO_MCGREGOR
+using CoreLibrary;
+
+namespace McGregor
 {
     class State
     {
         public int[,] G1, G2;
         public int countOfNullNodes;
-        public List<Tuple<int, int>> correspondingVerticles = new List<Tuple<int, int>>();
-        public List<Tuple<Edge, Edge>> correspondingEdges = new List<Tuple<Edge, Edge>>();
+        public List<(int v1, int v2)> correspondingVerticles = new List<(int v1, int v2)>();
+        public List<(Edge edge1, Edge edge2)> correspondingEdges = new List<(Edge edge1, Edge edge2)>();
         public int countOfEdges;
         public int countOfTrackedEdges = 0;
         public State(int [,] G1 = null, int [,] G2 = null)
@@ -39,10 +38,10 @@ namespace TAIO_MCGREGOR
         public State Copy()
         {
             State s = new State(G1,G2);
-            s.correspondingVerticles = new List<Tuple<int, int>>(correspondingVerticles);
+            s.correspondingVerticles = new List<(int v1, int v2)>(correspondingVerticles);
             s.countOfEdges = countOfEdges;
             s.countOfNullNodes = countOfNullNodes;
-            s.correspondingEdges = new List<Tuple<Edge, Edge>>(correspondingEdges);
+            s.correspondingEdges = new List<(Edge edge1, Edge edge2)>(correspondingEdges);
             s.countOfTrackedEdges = countOfTrackedEdges;
             return s;
         }
@@ -50,7 +49,7 @@ namespace TAIO_MCGREGOR
         {
             if (n2 == -1) countOfNullNodes++;
             countOfEdges += edgesToAdd;
-            correspondingVerticles.Add(new Tuple<int, int>(n1, n2));
+            correspondingVerticles.Add((n1, n2));
         }
         //public override string ToString()
         //{

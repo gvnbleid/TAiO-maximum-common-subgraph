@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CoreLibrary;
+using McGregor;
 
 namespace TAIO_MCGREGOR
 {
@@ -49,8 +51,8 @@ namespace TAIO_MCGREGOR
         private static bool isFeasiblePair(State s, Tuple<int, int> pair, ref int countOfEdges)
         {
             int count = 0;
-            List<Tuple<Edge, Edge>> listOfEdges = new List<Tuple<Edge, Edge>>();
-            foreach (Tuple<int, int> el in s.correspondingVerticles)
+            List<(Edge edge1, Edge edge2)> listOfEdges = new List<(Edge edge1, Edge edge2)>();
+            foreach ((int v1, int v2) el in s.correspondingVerticles)
                 if (el.Item2 != -1)
                 {
                     if (s.G1[el.Item1, pair.Item1] != 0 ^ s.G2[el.Item2, pair.Item2] != 0)
@@ -59,7 +61,7 @@ namespace TAIO_MCGREGOR
                     {
                         if (s.G1[el.Item1, pair.Item1] == 1)
                         {
-                            listOfEdges.Add(new Tuple<Edge, Edge>(new Edge(el.Item1, pair.Item1), new Edge(el.Item2, pair.Item2)));
+                            listOfEdges.Add((new Edge(el.Item1, pair.Item1), new Edge(el.Item2, pair.Item2)));
                             count++;
                         }
                     }

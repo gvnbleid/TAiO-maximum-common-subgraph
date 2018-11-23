@@ -48,14 +48,18 @@
   <ItemGroup>
     <Compile Include="GeneticAlgorithm.cs" />
     <Compile Include="GoodRandom.cs" />
-    <Compile Include="Graph.cs" />
-    <Compile Include="GraphLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CoreLibrary\CoreLibrary.csproj">
+      <Project>{BD23023E-A827-4B1B-923F-CEE062C303BF}</Project>
+      <Name>CoreLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

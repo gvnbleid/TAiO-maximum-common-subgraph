@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
 
-namespace TAiO
+namespace CoreLibrary
 {
-    class GraphLoader
+    public static class GraphLoader
     {
         public static Graph LoadGraph(string pathToFile)
         {
@@ -55,6 +55,20 @@ namespace TAiO
                     throw new Exception("Empty file");
                 }
             }
+        }
+
+        public static void WriteSummary(Graph gA, Graph gB, List<(Edge edge1, Edge edge2)> matching, int matchingSize)
+        {
+            List<Edge> edges = matching.Select(x => x.edge1).ToList();
+            Graph foundGraph = GraphExtensions.ConstructGraphFromEdges(matchingSize, edges);
+            Console.WriteLine("Adjacency matrix of first input graph:");
+            //Console.WriteLine(gA);
+            gA.PrintToConsole(edges);
+            Console.WriteLine("Adjacency matrix of second input graph:");
+           // Console.WriteLine(gB);
+            gB.PrintToConsole(edges);
+            Console.WriteLine("Adjacency matrix of found maximum common subgraph: ");
+            Console.WriteLine(foundGraph);
         }
     }
 }

@@ -3,15 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace TAiO
+namespace CoreLibrary
 {
-    class Graph
+    public class Graph
     {
-        private int[,] _graph;
+        public int[,] AdjacencyMatrix { get; internal set; }
+
+        public List<int> Vertices = new List<int>();
+        public List<Edge> Edges = new List<Edge>();
 
         public Graph(int[,] graph)
         {
-            _graph = graph;
+            AdjacencyMatrix = graph;
+
+            int size = graph.GetLength(0);
+            if (size > 0)
+            {
+                Vertices.Add(0);
+                for (int i = 1; i < graph.GetLength(0); i++)
+                {
+                    Vertices.Add(i);
+                    for (int j = 0; j < i; j++)
+                    {
+                        if (graph[i, j] != 0)
+                        {
+                            Edges.Add(new Edge(i, j));
+                        }
+                    }
+                }
+            }
+        }
+
+        public Graph(int size)
+        {
+            AdjacencyMatrix = new int[size, size];
         }
 
         #region PropertiesWithoutLogic
@@ -22,7 +47,7 @@ namespace TAiO
 
         #region PropertiesWithLogic
 
-        public int Size => _graph.GetLength(0);
+        public int Size => AdjacencyMatrix.GetLength(0);
         public int EdgesCount
         {
             get
@@ -32,13 +57,13 @@ namespace TAiO
                 {
                     for (var j = 0; j < i; j++)
                     {
-                        if (_graph[i, j] == 1) count++;
+                        if (AdjacencyMatrix[i, j] == 1) count++;
                     }
                 }
                 return count;
             }
         }
-        public int this[int i, int j] => _graph[i, j];
+        public int this[int i, int j] => AdjacencyMatrix[i, j];
         public int NumberOfUnconnectedSubgraphs
         {
             get
@@ -48,7 +73,7 @@ namespace TAiO
                 {
                     for (var j = 0; j < Size; j++)
                     {
-                        if (_graph[i, j] == 1 && !edges.Contains((j, i)))
+                        if (AdjacencyMatrix[i, j] == 1 && !edges.Contains((j, i)))
                         {
                             edges.Add((i, j));
                         }
@@ -169,6 +194,43 @@ namespace TAiO
 
         #region PublicMethods
 
+        public void PrintToConsole(List<Edge> matching)
+        {
+            int[,] AdjacencyMatrixCopy = new int[AdjacencyMatrix.GetLength(0), AdjacencyMatrix.GetLength(0)];
+            for (int i = 0; i < AdjacencyMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < AdjacencyMatrix.GetLength(1); j++)
+                {
+                    AdjacencyMatrixCopy[i, j] = AdjacencyMatrix[i, j];
+                }
+            }
+            foreach (var el in matching)
+            {
+                AdjacencyMatrixCopy[el.v1, el.v2] = 2;
+                AdjacencyMatrixCopy[el.v2, el.v1] = 2;
+            }
+            
+            for (int i = 0; i < Size; i++)
+            {
+                for (int j = 0; j < Size; j++)
+                {
+                    if (AdjacencyMatrixCopy[i, j] == 2)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.White;
+                        Console.Write("1");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write(" ");
+                    }
+                    else
+                        Console.Write(AdjacencyMatrixCopy[i, j] + " ");
+                }
+                Console.Write("\n");
+            }
+            Console.Write("\n");            
+        }
+
         public void Mutate()
         {
             var vertexProbability = GoodRandom.Next(100);
@@ -211,7 +273,7 @@ namespace TAiO
         public int NumberOfUnconnectedSubgraphsInMatching(Graph match)
         {
             if (match.Size > Size) return int.MaxValue;
-            if (!(_graph.Clone() is int[,] matrixWithoutMatch))
+            if (!(AdjacencyMatrix.Clone() is int[,] matrixWithoutMatch))
             {
                 throw new InvalidCastException();
             }
@@ -283,7 +345,7 @@ namespace TAiO
             {
                 for (var j = 0; j < Size; j++)
                 {
-                    stringBuilder.Append($"{_graph[i, j]} ");
+                    stringBuilder.Append($"{AdjacencyMatrix[i, j]} ");
                 }
 
                 stringBuilder.AppendLine();
@@ -293,7 +355,7 @@ namespace TAiO
         }
         public Graph Clone()
         {
-            return new Graph(_graph);
+            return new Graph(AdjacencyMatrix);
         }
 
         #endregion
@@ -308,8 +370,8 @@ namespace TAiO
                 for (var i = 0; i < numberOfEdgesToAdd; i++)
                 {
                     var edge = possibleEdges[GoodRandom.Next(possibleEdges.Count)];
-                    _graph[edge.from, edge.to] = 1;
-                    _graph[edge.to, edge.from] = 1;
+                    AdjacencyMatrix[edge.from, edge.to] = 1;
+                    AdjacencyMatrix[edge.to, edge.from] = 1;
                     possibleEdges.Remove(edge);
                     if (possibleEdges.Count <= 0) break;
                 }
@@ -323,8 +385,8 @@ namespace TAiO
                 for (var i = 0; i < numberOfEdgesToRemove; i++)
                 {
                     var edge = edges[GoodRandom.Next(edges.Count)];
-                    _graph[edge.from, edge.to] = 0;
-                    _graph[edge.to, edge.from] = 0;
+                    AdjacencyMatrix[edge.from, edge.to] = 0;
+                    AdjacencyMatrix[edge.to, edge.from] = 0;
                     edges.Remove(edge);
                     if (edges.Count <= 0) break;
                 }
@@ -338,11 +400,11 @@ namespace TAiO
             {
                 for (var j = 0; j < Size; j++)
                 {
-                    newMatrix[i, j] = _graph[i, j];
+                    newMatrix[i, j] = AdjacencyMatrix[i, j];
                 }
             }
 
-            _graph = newMatrix;
+            AdjacencyMatrix = newMatrix;
         }
         private void RemoveRandomVertex(int numberOfVerticesToDelete)
         {
@@ -353,9 +415,9 @@ namespace TAiO
             verticesToDelete.Sort((v1, v2) => -v1.CompareTo(v2));
             foreach (var vertex in verticesToDelete)
             {
-                newMatrix = DeleteVertex(_graph, vertex);
+                newMatrix = DeleteVertex(AdjacencyMatrix, vertex);
             }
-            _graph = newMatrix;
+            AdjacencyMatrix = newMatrix;
         }
         private static int[,] DeleteVertex(int[,] matrix, int index)
         {
@@ -398,7 +460,7 @@ namespace TAiO
             {
                 for (var j = 0; j < Size; j++)
                 {
-                    if (_graph[i, j] == 1 && !edges.Contains((j, i)))
+                    if (AdjacencyMatrix[i, j] == 1 && !edges.Contains((j, i)))
                     {
                         edges.Add((i, j));
                     }
@@ -414,7 +476,7 @@ namespace TAiO
             {
                 for (var j = 0; j < Size; j++)
                 {
-                    if (_graph[i, j] == 0 && i != j && !emptyPairs.Contains((j, i)))
+                    if (AdjacencyMatrix[i, j] == 0 && i != j && !emptyPairs.Contains((j, i)))
                     {
                         emptyPairs.Add((i, j));
                     }
@@ -428,13 +490,13 @@ namespace TAiO
             var degree = 0;
             for (var i = 0; i < Size; i++)
             {
-                if (_graph[index, i] == 1) degree++;
+                if (AdjacencyMatrix[index, i] == 1) degree++;
             }
             return degree;
         }
         private int GetValueRound(int i, int j)
         {
-            return _graph[i % Size, j % Size];
+            return AdjacencyMatrix[i % Size, j % Size];
         }
         private static int GetChange(int probability)
         {

@@ -1,57 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CoreLibrary;
+using TAIO_MCGREGOR;
 
-namespace TAIO_MCGREGOR
+namespace McGregor
 {
     class Program
     {
         static void Main(string[] args)
         {
             DateTime dt = DateTime.Now;
-            int[,] G1 = null, G2 = null;
             int option = 0;
-            if (args.Any())
-                GraphReader.readArgs(args, out G1, out G2, ref option);
-            else
+            if (args.Length != 2)
             {
-                G1 = new int[,] {
-                    { 0,1,0,1,0,1,0,0 },
-                    { 1,0,1,1,0,1,1,1 },
-                    { 0,1,0,1,0,0,0,0 },
-                    { 1,1,1,0,1,1,0,1 },
-                    { 0,0,0,1,0,1,0,0 },
-                    { 1,1,0,1,1,0,1,0 },
-                    { 0,1,0,0,0,1,0,0 },
-                    { 0,1,0,1,0,0,0,0 }};
-                G2 = new int[,] {
-                    { 0,1,0,1,0,0,0,0 },
-                    { 1,0,1,1,0,1,1,1 },
-                    { 0,1,0,1,0,0,0,0 },
-                    { 1,1,1,0,1,1,0,1 },
-                    { 0,0,0,1,0,1,0,0 },
-                    { 0,1,0,1,1,0,1,0 },
-                    { 0,1,0,0,0,1,0,0 },
-                    { 0,1,0,1,0,0,0,0 } };
+                throw new ArgumentException(
+                    "Wrong number of arguments!Please specify two paths for the first and second input graphs");
             }
-            //Console.Write(Graph.convertFromMatrix(G1));
-            //Console.Write(Graph.convertFromMatrix(G2));
-            State s = new State(G1,G2);
-            Console.Write("V Solution\n");
 
+            var G1 = GraphLoader.LoadGraph(args[0]);
+            var G2 = GraphLoader.LoadGraph(args[1]);
+            State s = new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix);
+            
             if (option == 0)
             {
-                SolutionV.McGregor(new State(G1, G2), ref s);
-                Console.Write(s);
-                s = new State(G1, G2);
-                
+                Console.Write("V Solution\n");
+                SolutionV.McGregor(new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix), ref s);              
             }
             else
             {
                 Console.Write("V+E Solution\n");
-                SolutionV.McGregor(new State(G1, G2), ref s, 1);
-                Console.Write(s);
+                SolutionV.McGregor(new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix), ref s, 1);
             }
+
+            List<Edge> edges = s.correspondingEdges.Select(x => x.Item1).ToList();
+            GraphLoader.WriteSummary(G1, G2, s.correspondingEdges,
+                s.correspondingVerticles.Where(x => x.v1 != -1 && x.v2 != -1).Count());
 
         }
 
@@ -125,7 +109,7 @@ namespace TAIO_MCGREGOR
             bool used = false;
             for(int i=0;i<s.G2.GetLength(0);i++)
             {
-                foreach (Tuple<int, int> el in s.correspondingVerticles)
+                foreach (var el in s.correspondingVerticles)
                         if (el.Item2 == i) //used
                         {
                             used = true;

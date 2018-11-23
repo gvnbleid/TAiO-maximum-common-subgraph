@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TAIO_MCGREGOR
+namespace CoreLibrary
 {
-    class Edge
+    public class Edge
     {
         public Edge(int v1, int v2)
         {
@@ -16,7 +12,7 @@ namespace TAIO_MCGREGOR
         public int v1, v2;
         public override string ToString()
         {
-            return String.Format("<{0}, {1}>", v1, v2);
+            return $"<{v1}, {v2}>";
         }
         public override bool Equals(object obj)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CoreLibrary;
 
 namespace CliqueHeuristic
 {
@@ -8,35 +9,14 @@ namespace CliqueHeuristic
     {
         static void Main(string[] args)
         {
-            bool[,] gA, gB;
-            if (args.Any())
+            if (args.Length != 2)
             {
-                if (!GraphReader.tryReadArgs(args, out gA, out gB))
-                {
-                    return;
-                }
-            }
-            else
-            {
-                gA = new[,]
-                {
-                    {false, true, false, false, true},
-                    {true, false, true, false, false},
-                    {false, true, false, true, false},
-                    {false, false, true, false, true},
-                    {true, false, false, true, false}
-                };
-                gB = new[,]
-                {
-                    {false, true, false, false, true},
-                    {true, false, true, false, false},
-                    {false, true, false, true, false},
-                    {false, false, true, false, true},
-                    {true, false, false, true, false}
-                };
+                throw new ArgumentException("Wrong number of arguments! Please specify two paths for the first and second input graphs");
             }
 
-            Graph graphA = new Graph(gA), graphB = new Graph(gB);
+            var graphA = GraphLoader.LoadGraph(args[0]);
+            var graphB = GraphLoader.LoadGraph(args[1]);
+            
             Console.WriteLine("Graph A edges: " + graphA);
             Console.WriteLine("Graph B edges: " + graphB);
             Console.WriteLine();

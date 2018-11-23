@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CoreLibrary;
+using McGregor;
 
 namespace TAIO_MCGREGOR
 {
@@ -43,7 +45,7 @@ namespace TAIO_MCGREGOR
             List<Tuple<Edge, Edge>> listOfEdges = new List<Tuple<Edge, Edge>>();
             //if (pair.Item2 != -1)
             //{
-            foreach (Tuple<int, int> el in s.correspondingVerticles)
+            foreach ((int v1, int v2) el in s.correspondingVerticles)
                 if (el.Item2 != -1)
                 {
                     if (G1[el.Item1, pair.Item1] != 0 ^ G2[el.Item2, pair.Item2] != 0)
@@ -53,7 +55,7 @@ namespace TAIO_MCGREGOR
                         if (G1[el.Item1, pair.Item1] == 1)
                         {
                             //we can immediately add to State s
-                            s.correspondingEdges.Add(new Tuple<Edge, Edge>(new Edge(el.Item1, pair.Item1), new Edge(el.Item2, pair.Item2)));
+                            s.correspondingEdges.Add((new Edge(el.Item1, pair.Item1), new Edge(el.Item2, pair.Item2)));
                             count++;
                         }
                     }
