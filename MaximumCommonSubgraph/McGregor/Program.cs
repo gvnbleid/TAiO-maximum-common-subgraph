@@ -33,9 +33,9 @@ namespace McGregor
                 SolutionV.McGregor(new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix), ref s, 1);
             }
 
-            List<Edge> edges = s.correspondingEdges.Select(x => x.Item1).ToList();
+            //List<Edge> edges = s.correspondingEdges.Select(x => x.Item1).ToList();
             GraphLoader.WriteSummary(G1, G2, s.correspondingEdges,
-                s.correspondingVerticles.Where(x => x.v1 != -1 && x.v2 != -1).Count());
+                s.correspondingVerticles.Count(x => x.v1 != -1 && x.v2 != -1));
 
         }
 

@@ -59,16 +59,28 @@ namespace CoreLibrary
 
         public static void WriteSummary(Graph gA, Graph gB, List<(Edge edge1, Edge edge2)> matching, int matchingSize)
         {
-            List<Edge> edges = matching.Select(x => x.edge1).ToList();
-            Graph foundGraph = GraphExtensions.ConstructGraphFromEdges(matchingSize, edges);
-            Console.WriteLine("Adjacency matrix of first input graph:");
+            List<Edge> edgesFromFirstGraph = matching.Select(x => x.edge1).ToList();
+            List<Edge> edgesFromSecondGraph = matching.Select(x => x.edge2).ToList();
+            Graph foundGraph = GraphExtensions.ConstructGraphFromEdges(matchingSize, edgesFromFirstGraph);
+            Console.WriteLine("First input graph:");
             //Console.WriteLine(gA);
-            gA.PrintToConsole(edges);
-            Console.WriteLine("Adjacency matrix of second input graph:");
+            gA.PrintToConsole(edgesFromFirstGraph);
+            Console.WriteLine("Second input graph:");
            // Console.WriteLine(gB);
-            gB.PrintToConsole(edges);
-            Console.WriteLine("Adjacency matrix of found maximum common subgraph: ");
+            gB.PrintToConsole(edgesFromSecondGraph);
+            Console.WriteLine("Found maximum common subgraph: ");
             Console.WriteLine(foundGraph);
+        }
+
+        public static void WriteSummary(Graph gA, Graph gB, List<Edge> edgesA, List<Edge> edgesB, int matchingSize)
+        {
+            if (edgesA.Count != edgesB.Count)
+            {
+                throw new ArgumentException();
+            }
+
+            var zippedLists = edgesA.Zip(edgesB, (x, y) => (x, y)).ToList();
+            WriteSummary(gA, gB, zippedLists, matchingSize);
         }
     }
 }

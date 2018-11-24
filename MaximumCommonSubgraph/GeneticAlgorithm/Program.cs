@@ -45,7 +45,7 @@ namespace GeneticAlgorithm
 
             var watch = Stopwatch.StartNew();
 
-            var algorithm = new TAiO.GeneticAlgorithm(generationSize, generationCount, breakWhenScoreDrops);
+            var algorithm = new GeneticAlgorithm(generationSize, generationCount, breakWhenScoreDrops);
             var solution = algorithm.FindMaximalCommonSubgraph(g1, g2);
 
             Console.WriteLine(solution.ToString());

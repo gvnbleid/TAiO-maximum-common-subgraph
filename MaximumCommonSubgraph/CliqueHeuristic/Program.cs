@@ -9,26 +9,29 @@ namespace CliqueHeuristic
     {
         static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length != 3 || (args[2] != "V" && args[2] != "E"))
             {
-                throw new ArgumentException("Wrong number of arguments! Please specify two paths for the first and second input graphs");
+                throw new ArgumentException("Invalid arguments!");
             }
 
             var graphA = GraphLoader.LoadGraph(args[0]);
             var graphB = GraphLoader.LoadGraph(args[1]);
             
-            Console.WriteLine("Graph A edges: " + graphA);
-            Console.WriteLine("Graph B edges: " + graphB);
+            //Console.WriteLine("Graph A edges: " + graphA);
+            //Console.WriteLine("Graph B edges: " + graphB);
             Console.WriteLine();
 
             var modularGraph = new ModularGraph(graphA, graphB);
-            var vertexModeResult = modularGraph.LargestCliqueHeuristic(true);
-            Console.WriteLine("Vertices count maximum subgraph:");
-            Console.WriteLine(vertexModeResult.ConvertToString());
-            Console.WriteLine();
-            var sumModeResult = modularGraph.LargestCliqueHeuristic(false);
-            Console.WriteLine("Vertices and edges sum maximum subgraph:");
-            Console.WriteLine(sumModeResult.ConvertToString());
+            var result = modularGraph.LargestCliqueHeuristic(args[2] == "1");
+            //var edgesA = graphA.GetEdgesByGivenVertices(result.Item1);
+            //var edgesB = graphB.GetEdgesByGivenVertices(result.Item2);
+            //GraphLoader.WriteSummary(graphA, graphB, edgesA, edgesB, result.Item1.Count);
+            //Console.WriteLine("Vertices count maximum subgraph:");
+            //Console.WriteLine(vertexModeResult.ConvertToString());
+            //Console.WriteLine();
+            //var sumModeResult = modularGraph.LargestCliqueHeuristic(false);
+            //Console.WriteLine("Vertices and edges sum maximum subgraph:");
+            //Console.WriteLine(sumModeResult.ConvertToString());
         }
     }
     public static class TupleExtender

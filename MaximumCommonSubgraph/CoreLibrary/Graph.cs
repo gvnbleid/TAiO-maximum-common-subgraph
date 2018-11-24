@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace CoreLibrary
@@ -196,6 +197,27 @@ namespace CoreLibrary
 
         public void PrintToConsole(List<Edge> matching)
         {
+            if (Size <= 10)
+            {
+                WriteMatrix(matching);
+            }
+            else
+            {
+                Console.WriteLine(this);
+                Console.WriteLine($"Number of matching edges: {matching.Count}");
+                if(matching.Count <= 20)
+                {
+                    Console.WriteLine("List of matching edges:");
+                    foreach (var edge in matching)
+                    {
+                        Console.WriteLine($"<{edge.v1},{edge.v2}>");
+                    }
+                }
+            }
+        }
+
+        private void WriteMatrix(List<Edge> matching)
+        {
             int[,] AdjacencyMatrixCopy = new int[AdjacencyMatrix.GetLength(0), AdjacencyMatrix.GetLength(0)];
             for (int i = 0; i < AdjacencyMatrix.GetLength(0); i++)
             {
@@ -209,7 +231,7 @@ namespace CoreLibrary
                 AdjacencyMatrixCopy[el.v1, el.v2] = 2;
                 AdjacencyMatrixCopy[el.v2, el.v1] = 2;
             }
-            
+
             for (int i = 0; i < Size; i++)
             {
                 for (int j = 0; j < Size; j++)
@@ -228,7 +250,7 @@ namespace CoreLibrary
                 }
                 Console.Write("\n");
             }
-            Console.Write("\n");            
+            Console.Write("\n");
         }
 
         public void Mutate()
@@ -341,18 +363,33 @@ namespace CoreLibrary
         public override string ToString()
         {
             var stringBuilder = new StringBuilder();
-            for (var i = 0; i < Size; i++)
+            if (Size <= 10)
             {
-                for (var j = 0; j < Size; j++)
+                for (var i = 0; i < Size; i++)
                 {
-                    stringBuilder.Append($"{AdjacencyMatrix[i, j]} ");
-                }
+                    for (var j = 0; j < Size; j++)
+                    {
+                        stringBuilder.Append($"{AdjacencyMatrix[i, j]} ");
+                    }
 
-                stringBuilder.AppendLine();
+                    stringBuilder.AppendLine();
+                }
+            }
+
+            stringBuilder.AppendLine($"Number of vertices in graph: {Size}");
+            stringBuilder.AppendLine($"Number of edges in graph: {EdgesCount}");
+            if (EdgesCount <= 20)
+            {
+                stringBuilder.AppendLine($"List of edges: ");
+                foreach (var edge in Edges)
+                {
+                    stringBuilder.AppendLine($"<{edge.v1},{edge.v2}>");
+                }
             }
 
             return stringBuilder.ToString();
         }
+
         public Graph Clone()
         {
             return new Graph(AdjacencyMatrix);
