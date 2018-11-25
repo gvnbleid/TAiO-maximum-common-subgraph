@@ -62,13 +62,11 @@ namespace CoreLibrary
             List<Edge> edgesFromFirstGraph = matching.Select(x => x.edge1).ToList();
             List<Edge> edgesFromSecondGraph = matching.Select(x => x.edge2).ToList();
             Graph foundGraph = GraphExtensions.ConstructGraphFromEdges(matchingSize, edgesFromFirstGraph);
-            Console.WriteLine("First input graph:");
-            //Console.WriteLine(gA);
+            Console.WriteLine("***** First input graph *****");
             gA.PrintToConsole(edgesFromFirstGraph);
-            Console.WriteLine("Second input graph:");
-           // Console.WriteLine(gB);
+            Console.WriteLine("***** Second input graph *****:");
             gB.PrintToConsole(edgesFromSecondGraph);
-            Console.WriteLine("Found maximum common subgraph: ");
+            Console.WriteLine("***** Found maximum common subgraph *****");
             Console.WriteLine(foundGraph);
         }
 

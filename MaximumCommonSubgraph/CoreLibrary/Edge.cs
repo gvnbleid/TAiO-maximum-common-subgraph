@@ -18,9 +18,5 @@ namespace CoreLibrary
         {
             return ((obj as Edge).v1 == v1 && (obj as Edge).v2 == v2) || ((obj as Edge).v1 == v2 && (obj as Edge).v2 == v1);
         }
-        public override int GetHashCode()
-        {
-            return v1 * 1000000 + v2; //Copyright by Maciek
-        }
     }
 }

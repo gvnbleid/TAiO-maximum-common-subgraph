@@ -368,6 +368,7 @@ namespace CoreLibrary
             var stringBuilder = new StringBuilder();
             if (Size <= 10)
             {
+                stringBuilder.AppendLine("Adjacency matrix:");
                 for (var i = 0; i < Size; i++)
                 {
                     for (var j = 0; j < Size; j++)
@@ -377,6 +378,8 @@ namespace CoreLibrary
 
                     stringBuilder.AppendLine();
                 }
+
+                stringBuilder.AppendLine();
             }
 
             stringBuilder.AppendLine($"Number of vertices in graph: {Size}");
