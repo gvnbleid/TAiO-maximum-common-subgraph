@@ -15,7 +15,7 @@ namespace CoreLibrary
 
         public Graph(int[,] graph)
         {
-            AdjacencyMatrix = graph;
+            AdjacencyMatrix = graph.Clone() as int[,];
 
             int size = graph.GetLength(0);
             if (size > 0)
@@ -33,6 +33,9 @@ namespace CoreLibrary
                     }
                 }
             }
+
+            if (!this.IsCorrect())
+                throw new ArgumentException("Invalid input graph");
         }
 
         public Graph(int size)

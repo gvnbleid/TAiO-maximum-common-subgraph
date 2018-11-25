@@ -23,9 +23,9 @@ namespace CliqueHeuristic
 
             var modularGraph = new ModularGraph(graphA, graphB);
             var result = modularGraph.LargestCliqueHeuristic(args[2] == "1");
-            //var edgesA = graphA.GetEdgesByGivenVertices(result.Item1);
-            //var edgesB = graphB.GetEdgesByGivenVertices(result.Item2);
-            //GraphLoader.WriteSummary(graphA, graphB, edgesA, edgesB, result.Item1.Count);
+            var edgesA = graphA.Subgraph(result.Item1).Edges;
+            var edgesB = graphB.Subgraph(result.Item2).Edges;
+            GraphLoader.WriteSummary(graphA, graphB, edgesA, edgesB, result.Item1.Count);
             //Console.WriteLine("Vertices count maximum subgraph:");
             //Console.WriteLine(vertexModeResult.ConvertToString());
             //Console.WriteLine();

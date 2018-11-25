@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using CoreLibrary;
 using Priority_Queue;
@@ -60,6 +61,7 @@ namespace CliqueHeuristic
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public Tuple<HashSet<int>, HashSet<int>> LargestCliqueHeuristic(bool modeVerticesOnly)
         {
+            var path = @"C:\Users\User\Documents\log.txt";
             var vertexDegrees = VertexDegrees();
             var list = new LinkedList<CliqueNode>();
             var queue = new FastPriorityQueue<CliqueNode>(Size);
@@ -116,6 +118,11 @@ namespace CliqueHeuristic
                 }
                 if (mergable)
                 {
+                    using (var sw = File.AppendText(path))
+                    {
+                        sw.WriteLine($"{node1.CliqueNumber}-{node2.CliqueNumber}");
+                    }
+                    
                     node1.Vertices.UnionWith(node2.Vertices);
                     node1.VertexSmallestDegree = Math.Min(node1.VertexSmallestDegree, node2.VertexSmallestDegree);
                     for(var i = 0; i < Size; i++)

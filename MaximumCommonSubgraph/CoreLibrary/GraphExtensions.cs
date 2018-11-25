@@ -6,24 +6,6 @@ namespace CoreLibrary
 {
     public static class GraphExtensions
     {
-        public static List<Edge> GetEdgesByGivenVertices(this Graph g, IEnumerable<int> verticesNumbers)
-        {
-            var edges = new List<Edge>();
-            int[] vertices = verticesNumbers.ToArray();
-            for (int i = 0; i < vertices.Length; i++)
-            {
-                for (int j = i + 1; j < vertices.Length; j++)
-                {
-                    if (g.AdjacencyMatrix[vertices[i], vertices[j]] == 1)
-                    {
-                        edges.Add(new Edge(vertices[i], vertices[j]));
-                    }
-                }
-            }
-
-            return edges;
-        }
-
         public static Graph ConstructGraphFromEdges(int matchingSize, List<Edge> edges)
         {
             Dictionary<int, int> verticesMatching = new Dictionary<int, int>();
@@ -62,7 +44,8 @@ namespace CoreLibrary
         {
             if(from < 0 || from >= g.Size || to < 0 || to >= g.Size)
                 throw new ArgumentException("Invalid edge");
-            g.AdjacencyMatrix[from, to] = g.AdjacencyMatrix[to, from] = 1;
+            g.AdjacencyMatrix[from, to] = 1;
+            g.AdjacencyMatrix[to, from] = 1;
             g.Edges.Add(new Edge(from, to));
         }
         public static bool IsEdge(this Graph g, int from, int to)
