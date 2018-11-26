@@ -40,47 +40,26 @@ namespace CoreLibrary
             return result;
         }
 
-        public static void AddEdge(this Graph g, int from, int to)
+        public static int[,] DeleteVertex(int[,] matrix, int index)
         {
-            if(from < 0 || from >= g.Size || to < 0 || to >= g.Size)
-                throw new ArgumentException("Invalid edge");
-            g.AdjacencyMatrix[from, to] = 1;
-            g.AdjacencyMatrix[to, from] = 1;
-            g.Edges.Add(new Edge(from, to));
-        }
-        public static bool IsEdge(this Graph g, int from, int to)
-        {
-            return g.AdjacencyMatrix[from, to] == 1;
-        }
-        public static Graph Subgraph(this Graph g, HashSet<int> vertices)
-        {
-            var verticesArray = vertices.ToArray();
-            var mapping = new int[g.Size];
-            for (var i = 0; i < verticesArray.Length; i++)
-                mapping[verticesArray[i]] = i;
-
-            var subgraph = new Graph(vertices.Count);
-            foreach (var v in vertices)
+            var oldSize = matrix.GetLength(0);
+            var newSize = oldSize - 1;
+            var newMatrix = new int[newSize, newSize];
+            int iPrim = 0, jPrim = 0;
+            for (var i = 0; i < oldSize; i++)
             {
-                foreach (var w in vertices)
+                if (i == index) continue;
+                for (var j = 0; j < oldSize; j++)
                 {
-                    if (g.IsEdge(v, w))
-                        subgraph.AddEdge(mapping[v], mapping[w]);
+                    if (j == index) continue;
+                    newMatrix[iPrim, jPrim] = matrix[i, j];
+                    jPrim++;
                 }
+
+                jPrim = 0;
+                iPrim++;
             }
-            return subgraph;
-        }
-        public static bool IsCorrect(this Graph g)
-        {
-            if (g.AdjacencyMatrix.GetLength(0) != g.AdjacencyMatrix.GetLength(1))
-                return false;
-            for (var i = 0; i < g.AdjacencyMatrix.GetLength(0); i++)
-                for (var j = i; j < g.AdjacencyMatrix.GetLength(1); j++)
-                    if (j == i && g.AdjacencyMatrix[i, j] == 1) // loops
-                        return false;
-                    else if (g.AdjacencyMatrix[i, j] != g.AdjacencyMatrix[j, i])
-                        return false;
-            return true;
+            return newMatrix;
         }
     }
 }

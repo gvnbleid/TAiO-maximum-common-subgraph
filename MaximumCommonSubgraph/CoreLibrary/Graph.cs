@@ -198,6 +198,49 @@ namespace CoreLibrary
 
         #region PublicMethods
 
+        public void AddEdge(int from, int to)
+        {
+            if (from < 0 || from >= Size || to < 0 || to >= Size)
+                throw new ArgumentException("Invalid edge");
+            AdjacencyMatrix[from, to] = 1;
+            AdjacencyMatrix[to, from] = 1;
+            Edges.Add(new Edge(from, to));
+        }
+        public bool IsEdge(int from, int to)
+        {
+            return AdjacencyMatrix[from, to] == 1;
+        }
+        public Graph Subgraph(HashSet<int> vertices)
+        {
+            var verticesArray = vertices.ToArray();
+            var mapping = new int[Size];
+            for (var i = 0; i < verticesArray.Length; i++)
+                mapping[verticesArray[i]] = i;
+
+            var subgraph = new Graph(vertices.Count);
+            foreach (var v in vertices)
+            {
+                foreach (var w in vertices)
+                {
+                    if (IsEdge(v, w))
+                        subgraph.AddEdge(mapping[v], mapping[w]);
+                }
+            }
+            return subgraph;
+        }
+        public bool IsCorrect()
+        {
+            if (AdjacencyMatrix.GetLength(0) != AdjacencyMatrix.GetLength(1))
+                return false;
+            for (var i = 0; i < AdjacencyMatrix.GetLength(0); i++)
+            for (var j = i; j < AdjacencyMatrix.GetLength(1); j++)
+                if (j == i && AdjacencyMatrix[i, j] == 1) // loops
+                    return false;
+                else if (AdjacencyMatrix[i, j] != AdjacencyMatrix[j, i])
+                    return false;
+            return true;
+        }
+
         public void PrintToConsole(List<Edge> matching)
         {
             if (Size <= 10)
@@ -256,113 +299,6 @@ namespace CoreLibrary
             Console.Write("\n");
         }
 
-        public void Mutate()
-        {
-            var vertexProbability = GoodRandom.Next(100);
-            var edgeProbability = GoodRandom.Next(100);
-            var signDecision = GoodRandom.Bool();
-            var sign = signDecision ? -1 : 1;
-            var vertexChange = GetChange(vertexProbability);
-            var edgeChange = GetChange(edgeProbability);
-            vertexChange *= sign;
-            edgeChange *= sign;
-            if (vertexChange != 0)
-            {
-                var newSize = Size + vertexChange;
-                if (newSize > 0)
-                {
-                    if (newSize > Size)
-                    {
-                        AddRandomVertex(vertexChange);
-                    }
-                    else
-                    {
-                        RemoveRandomVertex(-vertexChange);
-                    }
-
-                }
-            }
-
-            if (edgeChange != 0)
-            {
-                if (edgeChange > 0)
-                {
-                    AddRandomEdges(edgeChange);
-                }
-                else
-                {
-                    RemoveRandomEdges(-edgeChange);
-                }
-            }
-        }
-        public int NumberOfUnconnectedSubgraphsInMatching(Graph match)
-        {
-            if (match.Size > Size) return int.MaxValue;
-            if (!(AdjacencyMatrix.Clone() is int[,] matrixWithoutMatch))
-            {
-                throw new InvalidCastException();
-            }
-            for (var i = 0; i < match.Size; i++)
-            {
-                for (var j = 0; j < match.Size; j++)
-                {
-                    if (match[i, j] == 1) matrixWithoutMatch[i, j] = 0;
-                }
-            }
-
-            var edges = new List<(int from, int to)>();
-            for (var i = 0; i < Size; i++)
-            {
-                for (var j = 0; j < Size; j++)
-                {
-                    if (matrixWithoutMatch[i, j] == 1 && !edges.Contains((j, i)))
-                    {
-                        edges.Add((i, j));
-                    }
-                }
-            }
-
-
-            if (edges.Count == 0) return 0;
-            var visited = new bool[Size];
-            var queue = new Queue<int>();
-            var subgraphsCount = 0;
-            while (visited.Contains(false))
-            {
-                for (var i = 0; i < Size; i++)
-                {
-                    if (visited[i] == false)
-                    {
-                        queue.Enqueue(i);
-                        break;
-                    }
-                }
-                subgraphsCount++;
-                while (queue.Count > 0)
-                {
-                    var p = queue.Dequeue();
-                    if (!visited[p])
-                    {
-                        visited[p] = true;
-                        foreach (var edge in edges.FindAll(e => e.from == p || e.to == p))
-                        {
-                            if (edge.from == p && !visited[edge.to])
-                            {
-                                queue.Enqueue(edge.to);
-                            }
-                            else if (!visited[edge.from])
-                            {
-                                queue.Enqueue(edge.from);
-                            }
-                        }
-                    }
-                }
-
-
-            }
-
-            return subgraphsCount;
-        }
         public override string ToString()
         {
             var stringBuilder = new StringBuilder();
@@ -405,84 +341,8 @@ namespace CoreLibrary
 
         #region HelperMethods_AddingAndRemovingEdgesAndVertices
 
-        private void AddRandomEdges(int numberOfEdgesToAdd)
-        {
-            var possibleEdges = GetPossibleEdges();
-            if (possibleEdges.Count > 0)
-            {
-                for (var i = 0; i < numberOfEdgesToAdd; i++)
-                {
-                    var edge = possibleEdges[GoodRandom.Next(possibleEdges.Count)];
-                    AdjacencyMatrix[edge.from, edge.to] = 1;
-                    AdjacencyMatrix[edge.to, edge.from] = 1;
-                    possibleEdges.Remove(edge);
-                    if (possibleEdges.Count <= 0) break;
-                }
-            }
-        }
-        private void RemoveRandomEdges(int numberOfEdgesToRemove)
-        {
-            var edges = GetEdges();
-            if (edges.Count > 0)
-            {
-                for (var i = 0; i < numberOfEdgesToRemove; i++)
-                {
-                    var edge = edges[GoodRandom.Next(edges.Count)];
-                    AdjacencyMatrix[edge.from, edge.to] = 0;
-                    AdjacencyMatrix[edge.to, edge.from] = 0;
-                    edges.Remove(edge);
-                    if (edges.Count <= 0) break;
-                }
-            }
-        }
-        private void AddRandomVertex(int numberOfVerticesToAdd)
-        {
-            var newSize = Size + numberOfVerticesToAdd;
-            var newMatrix = new int[newSize, newSize];
-            for (var i = 0; i < Size; i++)
-            {
-                for (var j = 0; j < Size; j++)
-                {
-                    newMatrix[i, j] = AdjacencyMatrix[i, j];
-                }
-            }
-
-            AdjacencyMatrix = newMatrix;
-        }
-        private void RemoveRandomVertex(int numberOfVerticesToDelete)
-        {
-            int[,] newMatrix = null;
-            var sortedVertices = SortVerticesBasedOnDegree();
-            var verticesToDelete = sortedVertices
-                .Take(numberOfVerticesToDelete).ToList();
-            verticesToDelete.Sort((v1, v2) => -v1.CompareTo(v2));
-            foreach (var vertex in verticesToDelete)
-            {
-                newMatrix = DeleteVertex(AdjacencyMatrix, vertex);
-            }
-            AdjacencyMatrix = newMatrix;
-        }
-        private static int[,] DeleteVertex(int[,] matrix, int index)
-        {
-            var oldSize = matrix.GetLength(0);
-            var newSize = oldSize - 1;
-            var newMatrix = new int[newSize, newSize];
-            int iPrim = 0, jPrim = 0;
-            for (var i = 0; i < oldSize; i++)
-            {
-                if (i == index) continue;
-                for (var j = 0; j < oldSize; j++)
-                {
-                    if (j == index) continue;
-                    newMatrix[iPrim, jPrim] = matrix[i, j];
-                    jPrim++;
-                }
-
-                jPrim = 0;
-                iPrim++;
-            }
-            return newMatrix;
-        }
+        
+       
         private int[] SortVerticesBasedOnDegree()
         {
             var vertices = new List<(int vertex, int degree)>();

@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="GeneticAlgorithm.cs" />
     <Compile Include="GoodRandom.cs" />
+    <Compile Include="GraphGeneticExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
