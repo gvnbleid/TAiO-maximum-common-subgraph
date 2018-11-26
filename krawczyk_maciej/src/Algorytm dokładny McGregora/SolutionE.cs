@@ -11,9 +11,9 @@ namespace TAIO_MCGREGOR
         public static void McGregor(State s, int[,] G1, int[,] G2, ref State max)
         {
             int count = 0;
-            int v1 = Program.firstNeighbour(s, G1);
+            int v1 = Program.firstNeighbour(s);
             if(v1 != -1)
-                foreach (var pair in Program.nextPair(s, v1, G2))
+                foreach (var pair in Program.nextPair(s, v1))
                 {
                     if (pair == null) break;
                     v1 = pair.Item1;
@@ -23,7 +23,7 @@ namespace TAIO_MCGREGOR
                         //Console.WriteLine(" correct! {0}", s.correspondingVerticles.Count - s.countOfNullNodes);
                         s.AddNewPair(pair.Item1, pair.Item2, count);
                         checkMax(s, ref max);
-                        if (!Program.LeafOfSearchTree(s, G1.GetLength(0)) /*&& !PruningCondition(s, max, maxScore)*/)
+                        if (!Program.LeafOfSearchTree(s) /*&& !PruningCondition(s, max, maxScore)*/)
                             McGregor(s, G1, G2, ref max);
                         s.Backtrack(count);
                     }
@@ -33,7 +33,7 @@ namespace TAIO_MCGREGOR
                 }
             //case with null node
             s.AddNewPair(v1, -1, 0);
-            if (!Program.LeafOfSearchTree(s, G1.GetLength(0)))
+            if (!Program.LeafOfSearchTree(s))
                 McGregor(s, G1, G2, ref max);
             s.Backtrack(0);
         }
