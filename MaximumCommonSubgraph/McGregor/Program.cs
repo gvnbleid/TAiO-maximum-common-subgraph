@@ -11,18 +11,16 @@ namespace McGregor
         static void Main(string[] args)
         {
             DateTime dt = DateTime.Now;
-            int option = 0;
-            if (args.Length != 2)
+            if (args.Length != 3 || (args[2] != "V" && args[2] != "E"))
             {
-                throw new ArgumentException(
-                    "Wrong number of arguments!Please specify two paths for the first and second input graphs");
+                throw new ArgumentException("Invalid arguments!");
             }
 
             var G1 = GraphLoader.LoadGraph(args[0]);
             var G2 = GraphLoader.LoadGraph(args[1]);
             State s = new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix);
             
-            if (option == 0)
+            if (args[2] == "V")
             {
                 Console.Write("V Solution\n");
                 SolutionV.McGregor(new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix), ref s);              
