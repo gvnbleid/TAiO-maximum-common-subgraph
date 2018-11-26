@@ -57,7 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CoreLibrary\CoreLibrary.csproj">
-      <Project>{BD23023E-A827-4B1B-923F-CEE062C303BF}</Project>
+      <Project>{ed0f66b5-b08b-4b6a-96d3-ef82e662c02a}</Project>
       <Name>CoreLibrary</Name>
     </ProjectReference>
   </ItemGroup>

@@ -9,7 +9,7 @@ namespace CoreLibrary
         public static int Next(int min, int max)
         {
             lock (SyncLock)
-            { 
+            {
                 return Random.Next(min, max);
             }
         }

@@ -44,6 +44,7 @@ namespace CoreLibrary
         }
 
         #region PropertiesWithoutLogic
+
         public int Score { get; set; }
         public int NormalizedScore { get; set; }
 
@@ -52,6 +53,7 @@ namespace CoreLibrary
         #region PropertiesWithLogic
 
         public int Size => AdjacencyMatrix.GetLength(0);
+
         public int EdgesCount
         {
             get
@@ -67,12 +69,18 @@ namespace CoreLibrary
                 return count;
             }
         }
+
         public int this[int i, int j] => AdjacencyMatrix[i, j];
+
         public int NumberOfUnconnectedSubgraphs
         {
             get
             {
-                var edges = new List<(int from, int to)>();
+                var edges = new List<(int
+                from,
+                int to) >
+                ()
+                ;
                 for (var i = 0; i < Size; i++)
                 {
                     for (var j = 0; j < Size; j++)
@@ -149,10 +157,11 @@ namespace CoreLibrary
 
             return new Graph(matrix);
         }
+
         public static Graph CreateChild(Graph mother, Graph father)
         {
-            var childSize = (mother.Size + father.Size) / 2;
-            if ((mother.Size + father.Size) % 2 == 1 && GoodRandom.Bool()) childSize++;
+            var childSize = (mother.Size + father.Size)/2;
+            if ((mother.Size + father.Size)%2 == 1 && GoodRandom.Bool()) childSize++;
             var child = new int[childSize, childSize];
             var decision = false;
             for (var i = 0; i < childSize; i++)
@@ -208,7 +217,7 @@ namespace CoreLibrary
             {
                 Console.WriteLine(this);
                 Console.WriteLine($"Number of matching edges: {matching.Count}");
-                if(matching.Count <= 20)
+                if (matching.Count <= 20)
                 {
                     Console.WriteLine("List of matching edges:");
                     foreach (var edge in matching)
@@ -295,10 +304,12 @@ namespace CoreLibrary
                 }
             }
         }
+
         public int NumberOfUnconnectedSubgraphsInMatching(Graph match)
         {
             if (match.Size > Size) return int.MaxValue;
-            if (!(AdjacencyMatrix.Clone() is int[,] matrixWithoutMatch))
+            if (!(AdjacencyMatrix.Clone() is int[,]
+            matrixWithoutMatch))
             {
                 throw new InvalidCastException();
             }
@@ -310,7 +321,11 @@ namespace CoreLibrary
                 }
             }
 
-            var edges = new List<(int from, int to)>();
+            var edges = new List<(int
+            from,
+            int to) >
+            ()
+            ;
             for (var i = 0; i < Size; i++)
             {
                 for (var j = 0; j < Size; j++)
@@ -363,6 +378,7 @@ namespace CoreLibrary
 
             return subgraphsCount;
         }
+
         public override string ToString()
         {
             var stringBuilder = new StringBuilder();
@@ -420,6 +436,7 @@ namespace CoreLibrary
                 }
             }
         }
+
         private void RemoveRandomEdges(int numberOfEdgesToRemove)
         {
             var edges = GetEdges();
@@ -435,6 +452,7 @@ namespace CoreLibrary
                 }
             }
         }
+
         private void AddRandomVertex(int numberOfVerticesToAdd)
         {
             var newSize = Size + numberOfVerticesToAdd;
@@ -449,6 +467,7 @@ namespace CoreLibrary
 
             AdjacencyMatrix = newMatrix;
         }
+
         private void RemoveRandomVertex(int numberOfVerticesToDelete)
         {
             int[,] newMatrix = null;
@@ -462,6 +481,7 @@ namespace CoreLibrary
             }
             AdjacencyMatrix = newMatrix;
         }
+
         private static int[,] DeleteVertex(int[,] matrix, int index)
         {
             var oldSize = matrix.GetLength(0);
@@ -483,12 +503,18 @@ namespace CoreLibrary
             }
             return newMatrix;
         }
+
         private int[] SortVerticesBasedOnDegree()
         {
-            var vertices = new List<(int vertex, int degree)>();
+            var vertices = new List<(int
+            vertex,
+            int degree) >
+            ()
+            ;
             for (var i = 0; i < Size; i++)
             {
-                vertices.Add((i, GetVertexDegree(i)));
+                vertices.Add((i, GetVertexDegree (i)))
+                ;
             }
 
             vertices.Sort((tuple1, tuple2) => tuple1.degree.CompareTo(tuple2.degree));
@@ -496,9 +522,17 @@ namespace CoreLibrary
                 .ConvertAll(tuple => tuple.vertex)
                 .ToArray();
         }
-        private List<(int from, int to)> GetEdges()
+
+        private List<
+        (
+        int from, 
+        int to
+        )>
+
+        GetEdges()
         {
-            var edges = new List<(int, int)>();
+            var edges = new List<(int, int) > ()
+            ;
             for (var i = 0; i < Size; i++)
             {
                 for (var j = 0; j < Size; j++)
@@ -512,9 +546,17 @@ namespace CoreLibrary
 
             return edges;
         }
-        private List<(int from, int to)> GetPossibleEdges()
+
+        private List<
+        (
+        int from, 
+        int to
+        )>
+
+        GetPossibleEdges()
         {
-            var emptyPairs = new List<(int, int)>();
+            var emptyPairs = new List<(int, int) > ()
+            ;
             for (var i = 0; i < Size; i++)
             {
                 for (var j = 0; j < Size; j++)
@@ -528,6 +570,7 @@ namespace CoreLibrary
 
             return emptyPairs;
         }
+
         private int GetVertexDegree(int index)
         {
             var degree = 0;
@@ -537,10 +580,12 @@ namespace CoreLibrary
             }
             return degree;
         }
+
         private int GetValueRound(int i, int j)
         {
-            return AdjacencyMatrix[i % Size, j % Size];
+            return AdjacencyMatrix[i%Size, j%Size];
         }
+
         private static int GetChange(int probability)
         {
             //gaussian probability should go here
@@ -567,6 +612,6 @@ namespace CoreLibrary
         }
 
         #endregion
-        
+
     }
 }

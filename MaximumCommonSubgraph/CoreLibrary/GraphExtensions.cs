@@ -42,7 +42,7 @@ namespace CoreLibrary
 
         public static void AddEdge(this Graph g, int from, int to)
         {
-            if(from < 0 || from >= g.Size || to < 0 || to >= g.Size)
+            if (from < 0 || from >= g.Size || to < 0 || to >= g.Size)
                 throw new ArgumentException("Invalid edge");
             g.AdjacencyMatrix[from, to] = 1;
             g.AdjacencyMatrix[to, from] = 1;

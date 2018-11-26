@@ -55,8 +55,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CoreLibrary\CoreLibrary.csproj">
-      <Project>{bd23023e-a827-4b1b-923f-cee062c303bf}</Project>
+      <Project>{ed0f66b5-b08b-4b6a-96d3-ef82e662c02a}</Project>
       <Name>CoreLibrary</Name>
     </ProjectReference>
   </ItemGroup>
