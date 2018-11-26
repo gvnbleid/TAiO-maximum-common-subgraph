@@ -57,12 +57,12 @@ namespace CoreLibrary
             }
         }
 
-        public static void WriteSummary(Graph gA, Graph gB, List<(Edge edge1, Edge edge2)> matching, int matchingSize)
+        /*public static void WriteSummary(Graph gA, Graph gB, List<(Edge edge1, Edge edge2)> matching, int matchingSize)
         {
             List<Edge> edgesFromFirstGraph = matching.Select(x => x.edge1).ToList();
-        List<Edge> edgesFromSecondGraph = matching.Select(x => x.edge2).ToList();
-        Graph foundGraph = GraphExtensions.ConstructGraphFromEdges(matchingSize, edgesFromFirstGraph);
-        Console.WriteLine("***** First input graph *****");
+            List<Edge> edgesFromSecondGraph = matching.Select(x => x.edge2).ToList();
+            Graph foundGraph = GraphExtensions.ConstructGraphFromEdges(matchingSize, edgesFromFirstGraph);
+            Console.WriteLine("***** First input graph *****");
             gA.PrintToConsole(edgesFromFirstGraph);
             Console.WriteLine("***** Second input graph *****:");
             gB.PrintToConsole(edgesFromSecondGraph);
@@ -70,15 +70,15 @@ namespace CoreLibrary
             Console.WriteLine(foundGraph);
         }
 
-    public static void WriteSummary(Graph gA, Graph gB, List<Edge> edgesA, List<Edge> edgesB, int matchingSize)
-    {
-        if (edgesA.Count != edgesB.Count)
+        public static void WriteSummary(Graph gA, Graph gB, List<Edge> edgesA, List<Edge> edgesB, int matchingSize)
         {
-            throw new ArgumentException();
-        }
+            if (edgesA.Count != edgesB.Count)
+            {
+                throw new ArgumentException();
+            }
 
-        var zippedLists = edgesA.Zip(edgesB, (x, y) => (x, y)).ToList();
-        WriteSummary(gA, gB, zippedLists, matchingSize);
+            var zippedLists = edgesA.Zip(edgesB, (x, y) => (x, y)).ToList();
+            WriteSummary(gA, gB, zippedLists, matchingSize);
+        }*/
     }
-}
 }

@@ -70,17 +70,62 @@ namespace CoreLibrary
             }
             return subgraph;
         }
-        public static bool IsCorrect(this Graph g)
+        private void AddRandomEdges(int numberOfEdgesToAdd)
         {
-            if (g.AdjacencyMatrix.GetLength(0) != g.AdjacencyMatrix.GetLength(1))
-                return false;
-            for (var i = 0; i < g.AdjacencyMatrix.GetLength(0); i++)
-                for (var j = i; j < g.AdjacencyMatrix.GetLength(1); j++)
-                    if (j == i && g.AdjacencyMatrix[i, j] == 1) // loops
-                        return false;
-                    else if (g.AdjacencyMatrix[i, j] != g.AdjacencyMatrix[j, i])
-                        return false;
-            return true;
+            var possibleEdges = GetPossibleEdges();
+            if (possibleEdges.Count > 0)
+            {
+                for (var i = 0; i < numberOfEdgesToAdd; i++)
+                {
+                    var edge = possibleEdges[GoodRandom.Next(possibleEdges.Count)];
+                    AdjacencyMatrix[edge.from, edge.to] = 1;
+                    AdjacencyMatrix[edge.to, edge.from] = 1;
+                    possibleEdges.Remove(edge);
+                    if (possibleEdges.Count <= 0) break;
+                }
+            }
+        }
+        private void RemoveRandomEdges(int numberOfEdgesToRemove)
+        {
+            var edges = GetEdges();
+            if (edges.Count > 0)
+            {
+                for (var i = 0; i < numberOfEdgesToRemove; i++)
+                {
+                    var edge = edges[GoodRandom.Next(edges.Count)];
+                    AdjacencyMatrix[edge.from, edge.to] = 0;
+                    AdjacencyMatrix[edge.to, edge.from] = 0;
+                    edges.Remove(edge);
+                    if (edges.Count <= 0) break;
+                }
+            }
+        }
+        private void AddRandomVertex(int numberOfVerticesToAdd)
+        {
+            var newSize = Size + numberOfVerticesToAdd;
+            var newMatrix = new int[newSize, newSize];
+            for (var i = 0; i < Size; i++)
+            {
+                for (var j = 0; j < Size; j++)
+                {
+                    newMatrix[i, j] = AdjacencyMatrix[i, j];
+                }
+            }
+
+            AdjacencyMatrix = newMatrix;
+        }
+        private void RemoveRandomVertex(int numberOfVerticesToDelete)
+        {
+            int[,] newMatrix = null;
+            var sortedVertices = SortVerticesBasedOnDegree();
+            var verticesToDelete = sortedVertices
+                .Take(numberOfVerticesToDelete).ToList();
+            verticesToDelete.Sort((v1, v2) => -v1.CompareTo(v2));
+            foreach (var vertex in verticesToDelete)
+            {
+                newMatrix = DeleteVertex(AdjacencyMatrix, vertex);
+            }
+            AdjacencyMatrix = newMatrix;
         }
     }
 }

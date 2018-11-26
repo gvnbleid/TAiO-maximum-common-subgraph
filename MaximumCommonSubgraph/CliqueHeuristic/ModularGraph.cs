@@ -146,7 +146,7 @@ namespace CliqueHeuristic
                     else
                     {
                         var newGVertices = new HashSet<int>(cliqueNode.Vertices.Select(FirstGraphVertex));
-                        var newGEdgeCount = _g.Subgraph(newGVertices).EdgesCount;
+                        var newGEdgeCount = _g.Subgraph(newGVertices).EdgeCount;
                         if (newGVertices.Count + newGEdgeCount > clique.Count + gEdgeCount)
                         {
                             clique = cliqueNode.Vertices;

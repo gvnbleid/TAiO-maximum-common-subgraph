@@ -146,8 +146,8 @@ namespace GeneticAlgorithm
         {
             if (target.NumberOfUnconnectedSubgraphs > 1) return -(g1.Size + g2.Size);
             if (target.Size > g1.Size || target.Size > g2.Size) return -(g1.Size + g2.Size);
-            if(target.EdgesCount>g1.EdgesCount||target.EdgesCount>g2.EdgesCount) return -(g1.Size + g2.Size);
-            var n = 2 * target.EdgesCount;
+            if(target.EdgeCount>g1.EdgeCount||target.EdgeCount>g2.EdgeCount) return -(g1.Size + g2.Size);
+            var n = 2 * target.EdgeCount;
             var t1 = CalculateT(g1, target);
             var t2 = CalculateT(g2, target);
             return n - (t1 + t2 - 2);

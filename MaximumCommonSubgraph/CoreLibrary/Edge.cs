@@ -17,7 +17,7 @@ namespace CoreLibrary
         }
         public override bool Equals(object obj)
         {
-            return ((obj as Edge).v1 == v1 && (obj as Edge).v2 == v2) || ((obj as Edge).v1 == v2 && (obj as Edge).v2 == v1);
+            return ((obj as Edge)?.v1 == v1 && (obj as Edge).v2 == v2) || ((obj as Edge)?.v1 == v2 && (obj as Edge).v2 == v1);
         }
     }
 }
