@@ -249,11 +249,16 @@ namespace GeneticAlgorithm
             return new Graph(matrix);
         }
 
-        public static Graph CreateChild(Graph mother, Graph father)
+        public static Graph CreateChild(Graph mother, Graph father,int g1,int g2)
         {
             var childSize = (mother.Size + father.Size) / 2;
             if ((mother.Size + father.Size) % 2 == 1 && GoodRandom.Bool()) childSize++;
+            if (childSize > g1 || childSize > g2)
+            {
+                childSize = g1 > g2 ? g1 : g2;
+            }
             var child = new int[childSize, childSize];
+            var (childMatching1, childMatching2) = InheritMatching(mother, father, childSize, g1, g2);
             var decision = false;
             for (var i = 0; i < childSize; i++)
             {
@@ -291,7 +296,82 @@ namespace GeneticAlgorithm
                     }
                 }
             }
-            return new Graph(child);
+
+            return new Graph(child)
+            {
+                Matching1 = childMatching1,
+                Matching2 = childMatching2
+            };
+        }
+
+        private static (int[] matching1, int[] matching2) InheritMatching(Graph mother, Graph father, int childSize,
+            int g1, int g2)
+        {
+            var smallerParentSize = mother.Size > father.Size ? father.Size : mother.Size;
+            var matching1 = new int[childSize];
+            var matching2 = new int[childSize];
+            for (var i = 0; i < smallerParentSize; i++)
+            {
+                if (mother.Matching1[i] == father.Matching1[i])
+                {
+                    matching1[i] = mother.Matching1[i];
+                }
+                else
+                {
+                    matching1[i] = GoodRandom.Bool() ? mother.Matching1[i] : father.Matching1[i];
+                }
+
+                if (mother.Matching2[i] == father.Matching2[i])
+                {
+                    matching2[i] = mother.Matching2[i];
+                }
+                else
+                {
+                    matching2[i] = GoodRandom.Bool() ? mother.Matching2[i] : father.Matching2[i];
+                }
+            }
+
+            for (var i = smallerParentSize; i < childSize; i++)
+            {
+                if (mother.Size > father.Size)
+                {
+                    matching1[i] = mother.Matching1[i];
+                    matching2[i] = mother.Matching2[i];
+                }
+                else
+                {
+                    matching1[i] = father.Matching1[i];
+                    matching2[i] = father.Matching2[i];
+                }
+            }
+
+            FixMatching(ref matching1, g1);
+            FixMatching(ref matching2, g2);
+            return (matching1, matching2);
+        }
+
+        private static void FixMatching(ref int[] matching, int g)
+        {
+            var usedVertices = new List<int>();
+            foreach (var vertex in matching)
+            {
+                var target = vertex;
+                if (!usedVertices.Contains(target))
+                {
+                    usedVertices.Add(target);
+                }
+                else
+                {
+                    while (usedVertices.Contains(target))
+                    {
+                        target = ++target % g;
+                    }
+
+                    usedVertices.Add(target);
+                }
+            }
+
+            matching = usedVertices.ToArray();
         }
 
         private static int GetValueRound(this Graph g, int i, int j)

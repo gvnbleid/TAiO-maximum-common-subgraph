@@ -48,7 +48,15 @@ namespace GeneticAlgorithm
             var algorithm = new GeneticAlgorithm(generationSize, generationCount, breakWhenScoreDrops);
             var solution = algorithm.FindMaximalCommonSubgraph(g1, g2);
 
-            Console.WriteLine(solution.ToString());
+
+            try
+            {
+                GraphLoader.WriteSummary(g1, g2, g1.Subgraph(solution.Matching1).Edges,
+                    g2.Subgraph(solution.Matching2).Edges, solution.Size);
+            }
+            catch (Exception)
+            {
+            }
 #if DEBUG
 
             Console.WriteLine($"{watch.ElapsedMilliseconds}ms, score={solution.Score}");
