@@ -53,7 +53,7 @@ namespace GeneticAlgorithm
         {
             for (var i = 0; i < generationSize; i++)
             {
-                _generation.Add(Graph.CreateRandomGraph(maxSize));
+                _generation.Add(GraphGeneticExtensions.CreateRandomGraph(maxSize));
             }
         }
 
@@ -88,7 +88,7 @@ namespace GeneticAlgorithm
             {
                 var fatherIndex = SelectParentIndex(null);
                 var motherIndex = SelectParentIndex(fatherIndex);
-                var babyGraph = Graph.CreateChild(_generation[motherIndex], _generation[fatherIndex]);
+                var babyGraph = GraphGeneticExtensions.CreateChild(_generation[motherIndex], _generation[fatherIndex]);
                 babies.Add(babyGraph);
             }
 
@@ -144,7 +144,7 @@ namespace GeneticAlgorithm
 
         private static int CalculateScore(Graph g1, Graph g2, Graph target)
         {
-            if (target.NumberOfUnconnectedSubgraphs > 1) return -(g1.Size + g2.Size);
+            if (target.CalculateNumberOfUnconnectedSubgraphs() > 1) return -(g1.Size + g2.Size);
             if (target.Size > g1.Size || target.Size > g2.Size) return -(g1.Size + g2.Size);
             if(target.EdgesCount>g1.EdgesCount||target.EdgesCount>g2.EdgesCount) return -(g1.Size + g2.Size);
             var n = 2 * target.EdgesCount;
