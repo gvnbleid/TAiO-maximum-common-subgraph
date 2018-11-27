@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace TAiO
+namespace GeneticAlgorithm
 {
     public class GoodRandom
     {

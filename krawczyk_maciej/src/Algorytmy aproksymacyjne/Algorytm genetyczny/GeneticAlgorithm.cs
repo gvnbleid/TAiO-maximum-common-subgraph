@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
+using CoreLib;
 
-namespace TAiO
+namespace GeneticAlgorithm
 {
     class GeneticAlgorithm
     {
@@ -13,7 +12,7 @@ namespace TAiO
         private readonly bool _breakWhenScoreDrops;
         private List<Graph> _generation;
 
-        public GeneticAlgorithm(int generationSize, int generationCount,bool breakWhenScoreDrops)
+        public GeneticAlgorithm(int generationSize, int generationCount, bool breakWhenScoreDrops)
         {
             _generationSize = generationSize;
             _generationCount = generationCount;
@@ -26,25 +25,27 @@ namespace TAiO
             _generation = new List<Graph>();
             var maxSize = g1.Size < g2.Size ? g1.Size : g2.Size;
             var generationScore = int.MinValue;
-            CreateFirstGeneration(_generationSize,maxSize);
+            CreateFirstGeneration(_generationSize, maxSize);
+            _generation.ForEach(g => g.CreateRandomMatching1(g1));
+            _generation.ForEach(g => g.CreateRandomMatching2(g2));
             for (var i = 0; i < _generationCount; i++)
             {
-                AssignScores(g1,g2);
+                AssignScores(g1, g2);
                 _generation.Sort((graph1, graph2) => graph1.Score.CompareTo(graph2.Score));
                 if (_generation.First().Score > best.Score) best = _generation.First().Clone();
                 KillHalfOfTheGeneration();
-                var babies=MakeBabies();
+                var babies = MakeBabies(g1, g2);
                 _generation.AddRange(babies);
                 ApplyMutation();
                 var newGenerationScore = CalculateGenerationScore();
-                if (newGenerationScore < generationScore&&_breakWhenScoreDrops) break;
+                if (newGenerationScore < generationScore && _breakWhenScoreDrops) break;
                 generationScore = newGenerationScore;
 #if DEBUG
-                AssignScores(g1,g2);
+                AssignScores(g1, g2);
                 Console.WriteLine($"Generation #{i}, score = {CalculateGenerationScore()}");
 #endif
             }
-            AssignScores(g1,g2);
+            AssignScores(g1, g2);
             var bestScore = _generation.Max(graph => graph.Score);
             var bestInLastGeneration = _generation.First(graph => graph.Score == bestScore);
             return best.Score > bestInLastGeneration.Score ? best : bestInLastGeneration;
@@ -54,7 +55,7 @@ namespace TAiO
         {
             for (var i = 0; i < generationSize; i++)
             {
-                _generation.Add(Graph.CreateRandomGraph(maxSize));
+                _generation.Add(GraphGeneticExtensions.CreateRandomGraph(maxSize));
             }
         }
 
@@ -67,11 +68,12 @@ namespace TAiO
         {
             foreach (var graph in _generation)
             {
+                var sizebefore = graph.Size;
                 graph.Mutate();
             }
         }
 
-        private List<Graph> MakeBabies()
+        private List<Graph> MakeBabies(Graph g1, Graph g2)
         {
             var babies = new List<Graph>();
             var minScore = _generation.Min(graph => graph.Score);
@@ -89,7 +91,7 @@ namespace TAiO
             {
                 var fatherIndex = SelectParentIndex(null);
                 var motherIndex = SelectParentIndex(fatherIndex);
-                var babyGraph = Graph.CreateChild(_generation[motherIndex], _generation[fatherIndex]);
+                var babyGraph = GraphGeneticExtensions.CreateChild(_generation[motherIndex], _generation[fatherIndex], g1.Size, g2.Size);
                 babies.Add(babyGraph);
             }
 
@@ -129,10 +131,10 @@ namespace TAiO
 
         private int SelectParentIndex(int? blockedIndex)
         {
-            var indices=new List<int>();
+            var indices = new List<int>();
             for (var i = 0; i < _generation.Count; i++)
             {
-                if(blockedIndex.HasValue&&blockedIndex.Value==i) continue;
+                if (blockedIndex.HasValue && blockedIndex.Value == i) continue;
                 for (var j = 0; j < _generation[i].NormalizedScore; j++)
                 {
                     indices.Add(i);
@@ -145,18 +147,14 @@ namespace TAiO
 
         private static int CalculateScore(Graph g1, Graph g2, Graph target)
         {
-            if (target.NumberOfUnconnectedSubgraphs > 1) return -(g1.Size + g2.Size);
-            if (target.Size > g1.Size || target.Size > g2.Size) return -(g1.Size + g2.Size);
-            if(target.EdgesCount>g1.EdgesCount||target.EdgesCount>g2.EdgesCount) return -(g1.Size + g2.Size);
+            if (target.CalculateNumberOfUnconnectedSubgraphs() > 1) return -(g1.Size + g2.Size);                                   //podgraf niespójny
+            if (target.Size > g1.Size || target.Size > g2.Size) return -(g1.Size + g2.Size);                            //podgraf większy od któregoś z wejściowych
+            if (target.EdgesCount > g1.EdgesCount || target.EdgesCount > g2.EdgesCount) return -(g1.Size + g2.Size);    //podgraf ze zby dużą ilością krawędzi
             var n = 2 * target.EdgesCount;
-            var t1 = CalculateT(g1, target);
-            var t2 = CalculateT(g2, target);
+            var t1 = target.NumberOfUnconnectedSubgraphsInMatching1(g1, out var unableToCalculate1);
+            var t2 = target.NumberOfUnconnectedSubgraphsInMatching2(g2, out var unableToCalculate2);
+            if (unableToCalculate1 || unableToCalculate2) return -(g1.Size + g2.Size);                                  //krawędź w podgrafie nie istnieje w zródłowym
             return n - (t1 + t2 - 2);
-        }
-
-        private static int CalculateT(Graph g, Graph target)
-        {
-            return g.NumberOfUnconnectedSubgraphsInMatching(target);
         }
 
         #endregion

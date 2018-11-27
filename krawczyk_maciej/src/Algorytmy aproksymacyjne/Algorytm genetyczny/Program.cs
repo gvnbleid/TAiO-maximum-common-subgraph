@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
-using System.IO;
+using CoreLib;
 
-namespace TAiO
+namespace GeneticAlgorithm
 {
     class Program
     {
         static void Main(string[] args)
         {
             string pathToFile1, pathToFile2;
-            int generationSize = 0, generationCount = 0;
+            int generationSize, generationCount;
             var breakWhenScoreDrops = false;
             if (args.Length < 4)
             {
@@ -49,7 +48,15 @@ namespace TAiO
             var algorithm = new GeneticAlgorithm(generationSize, generationCount, breakWhenScoreDrops);
             var solution = algorithm.FindMaximalCommonSubgraph(g1, g2);
 
-            Console.WriteLine(solution.ToString());
+
+            try
+            {
+                GraphLoader.WriteSummary(g1, g2, g1.Subgraph(solution.Matching1).Edges,
+                    g2.Subgraph(solution.Matching2).Edges, solution.Size);
+            }
+            catch (Exception)
+            {
+            }
 #if DEBUG
 
             Console.WriteLine($"{watch.ElapsedMilliseconds}ms, score={solution.Score}");

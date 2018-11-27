@@ -1,59 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CoreLib;
+using TAIO_MCGREGOR;
 
-namespace TAIO_MCGREGOR
+namespace McGregor
 {
     class Program
     {
         static void Main(string[] args)
         {
             DateTime dt = DateTime.Now;
-            int[,] G1 = null, G2 = null;
-            int option = 1;
-            if (args.Any())
-                GraphReader.readArgs(args, out G1, out G2, ref option);
+            if (args.Length != 3 || (args[2] != "V" && args[2] != "E"))
+            {
+                throw new ArgumentException("Invalid arguments!");
+            }
+
+            var G1 = GraphLoader.LoadGraph(args[0]);
+            var G2 = GraphLoader.LoadGraph(args[1]);
+            State s = new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix);
+            
+            if (args[2] == "V")
+            {
+                Console.Write("V Solution\n");
+                SolutionV.McGregor(new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix), ref s);              
+            }
             else
             {
-                G1 = new int[,] {
-                    { 0,1,0,1,0,1,0,0 },
-                    { 1,0,1,1,0,1,1,1 },
-                    { 0,1,0,1,0,0,0,0 },
-                    { 1,1,1,0,1,1,0,1 },
-                    { 0,0,0,1,0,1,0,0 },
-                    { 1,1,0,1,1,0,1,0 },
-                    { 0,1,0,0,0,1,0,0 },
-                    { 0,1,0,1,0,0,0,0 }};
-                G2 = new int[,] {
-                    { 0,1,0,1,0,0,0,0 },
-                    { 1,0,1,1,0,1,1,1 },
-                    { 0,1,0,1,0,0,0,0 },
-                    { 1,1,1,0,1,1,0,1 },
-                    { 0,0,0,1,0,1,0,0 },
-                    { 0,1,0,1,1,0,1,0 },
-                    { 0,1,0,0,0,1,0,0 },
-                    { 0,1,0,1,0,0,0,0 } };
+                Console.Write("V+E Solution\n");
+                SolutionV.McGregor(new State(G1.AdjacencyMatrix, G2.AdjacencyMatrix), ref s, 1);
             }
-            Console.Write(Graph.convertFromMatrix(G1));
-            Console.Write(Graph.convertFromMatrix(G2));
-            State s = new State();
-            if(option == 1)
-                SolutionV.McGregor(new State(), G1, G2, ref s);
-            else if(option == 2)
-                SolutionE.McGregor(new State(), G1, G2, ref s);
-            Console.Write(s);
+
+            //List<Edge> edges = s.correspondingEdges.Select(x => x.Item1).ToList();
+            GraphLoader.WriteSummary(G1, G2, s.correspondingEdges,
+                s.correspondingVerticles.Count(x => x.v1 != -1 && x.v2 != -1));
 
         }
 
-        public static bool LeafOfSearchTree(State s, int limit)
+        public static bool LeafOfSearchTree(State s)
         {
+            int limit = s.G1.GetLength(0);
             return s.correspondingVerticles.Count >= limit;
         }
         
-        public static int firstNeighbour(State s, int[,] G1)
+        public static int firstNeighbour(State s)
         {
             int v1 = -1;
             bool selected = false;
@@ -64,9 +54,9 @@ namespace TAIO_MCGREGOR
                 foreach (var el in s.correspondingVerticles)
                 {
                     if (el.Item2 == -1) continue;
-                    for (int i = 0; i < G1.GetLength(0); i++)
+                    for (int i = 0; i < s.G1.GetLength(0); i++)
                     {
-                        if (G1[i, el.Item1] == 1)
+                        if (s.G1[i, el.Item1] == 1)
                         {
                             foreach (var el2 in s.correspondingVerticles)
                                 if (el2.Item1 == i)
@@ -93,7 +83,7 @@ namespace TAIO_MCGREGOR
             else
             {
 
-                for (int i = 0; i < G1.GetLength(0); i++)
+                for (int i = 0; i < s.G1.GetLength(0); i++)
                 {
                     foreach (var el in s.correspondingVerticles)
                         if (el.Item1 == i)
@@ -111,13 +101,13 @@ namespace TAIO_MCGREGOR
             }
             return v1;
         }
-        public static IEnumerable<Tuple<int,int>> nextPair(State s, int v1, int[,] G2)
+        public static IEnumerable<Tuple<int,int>> nextPair(State s, int v1)
         {
             
             bool used = false;
-            for(int i=0;i<G2.GetLength(0);i++)
+            for(int i=0;i<s.G2.GetLength(0);i++)
             {
-                foreach (Tuple<int, int> el in s.correspondingVerticles)
+                foreach (var el in s.correspondingVerticles)
                         if (el.Item2 == i) //used
                         {
                             used = true;
