@@ -26,6 +26,8 @@ namespace GeneticAlgorithm
             var maxSize = g1.Size < g2.Size ? g1.Size : g2.Size;
             var generationScore = int.MinValue;
             CreateFirstGeneration(_generationSize,maxSize);
+            _generation.ForEach(g=>g.CreateRandomMatching1(g1));
+            _generation.ForEach(g=>g.CreateRandomMatching2(g2));
             for (var i = 0; i < _generationCount; i++)
             {
                 AssignScores(g1,g2);
@@ -144,18 +146,14 @@ namespace GeneticAlgorithm
 
         private static int CalculateScore(Graph g1, Graph g2, Graph target)
         {
-            if (target.NumberOfUnconnectedSubgraphs > 1) return -(g1.Size + g2.Size);
-            if (target.Size > g1.Size || target.Size > g2.Size) return -(g1.Size + g2.Size);
-            if(target.EdgesCount>g1.EdgesCount||target.EdgesCount>g2.EdgesCount) return -(g1.Size + g2.Size);
+            if (target.NumberOfUnconnectedSubgraphs > 1) return -(g1.Size + g2.Size);                                   //podgraf niespójny
+            if (target.Size > g1.Size || target.Size > g2.Size) return -(g1.Size + g2.Size);                            //podgraf większy od któregoś z wejściowych
+            if (target.EdgesCount > g1.EdgesCount || target.EdgesCount > g2.EdgesCount) return -(g1.Size + g2.Size);    //podgraf ze zby dużą ilością krawędzi
             var n = 2 * target.EdgesCount;
-            var t1 = CalculateT(g1, target);
-            var t2 = CalculateT(g2, target);
+            var t1 = target.NumberOfUnconnectedSubgraphsInMatching1(g1, out var unableToCalculate1);
+            var t2 = target.NumberOfUnconnectedSubgraphsInMatching2(g2, out var unableToCalculate2);
+            if (unableToCalculate1 || unableToCalculate2) return -(g1.Size + g2.Size);                                  //krawędź w podgrafie nie istnieje w zródłowym
             return n - (t1 + t2 - 2);
-        }
-
-        private static int CalculateT(Graph g, Graph target)
-        {
-            return g.NumberOfUnconnectedSubgraphsInMatching(target);
         }
 
         #endregion

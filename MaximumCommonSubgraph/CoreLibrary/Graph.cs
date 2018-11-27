@@ -46,6 +46,8 @@ namespace CoreLibrary
         #region PropertiesWithoutLogic
         public int Score { get; set; }
         public int NormalizedScore { get; set; }
+        public int[] Matching1 { get; set; }
+        public int[] Matching2 { get; set; }
 
         #endregion
 
@@ -149,11 +151,13 @@ namespace CoreLibrary
 
             return new Graph(matrix);
         }
+
         public static Graph CreateChild(Graph mother, Graph father)
         {
             var childSize = (mother.Size + father.Size) / 2;
             if ((mother.Size + father.Size) % 2 == 1 && GoodRandom.Bool()) childSize++;
             var child = new int[childSize, childSize];
+            var (childMatching1, childMatching2) = InheritMatching(mother, father,childSize); 
             var decision = false;
             for (var i = 0; i < childSize; i++)
             {
@@ -191,7 +195,55 @@ namespace CoreLibrary
                     }
                 }
             }
-            return new Graph(child);
+
+            return new Graph(child)
+            {
+                Matching1 = childMatching1,
+                Matching2 = childMatching2
+            };
+        }
+
+        private static (int[] matching1, int[] matching2) InheritMatching(Graph mother, Graph father, int childSize)
+        {
+            var smallerParentSize = mother.Size > father.Size ? father.Size : mother.Size;
+            var matching1 = new int[childSize];
+            var matching2 = new int[childSize];
+            for (var i = 0; i < smallerParentSize; i++)
+            {
+                if (mother.Matching1[i] == father.Matching1[i])
+                {
+                    matching1[i] = mother.Matching1[i];
+                }
+                else
+                {
+                    matching1[i] = GoodRandom.Bool() ? mother.Matching1[i] : father.Matching1[i];
+                }
+
+                if (mother.Matching2[i] == father.Matching2[i])
+                {
+                    matching2[i] = mother.Matching2[i];
+                }
+                else
+                {
+                    matching2[i] = GoodRandom.Bool() ? mother.Matching2[i] : father.Matching2[i];
+                }
+            }
+
+            for (var i = smallerParentSize; i < childSize; i++)
+            {
+                if (mother.Size > father.Size)
+                {
+                    matching1[i] = mother.Matching1[i];
+                    matching2[i] = mother.Matching2[i];
+                }
+                else
+                {
+                    matching1[i] = father.Matching1[i];
+                    matching2[i] = father.Matching2[i];
+                }
+            }
+
+            return (matching1, matching2);
         }
 
         #endregion
@@ -295,25 +347,49 @@ namespace CoreLibrary
                 }
             }
         }
-        public int NumberOfUnconnectedSubgraphsInMatching(Graph match)
+
+        public int NumberOfUnconnectedSubgraphsInMatching1(Graph target,out bool unableToCalculate)
         {
-            if (match.Size > Size) return int.MaxValue;
-            if (!(AdjacencyMatrix.Clone() is int[,] matrixWithoutMatch))
+            unableToCalculate = false;
+            var isolatedVertices = new List<int>();
+            if (Size > target.Size)
+            {
+                unableToCalculate = true;
+                return int.MaxValue;
+            }
+            if (!(target.AdjacencyMatrix.Clone() is int[,] matrixWithoutMatch))
             {
                 throw new InvalidCastException();
             }
-            for (var i = 0; i < match.Size; i++)
+
+            for (var i = 0; i < Size; i++)
             {
-                for (var j = 0; j < match.Size; j++)
+                for (var j = 0; j < Size; j++)
                 {
-                    if (match[i, j] == 1) matrixWithoutMatch[i, j] = 0;
+                    if (AdjacencyMatrix[i, j] != 1) continue;
+                    try
+                    {
+                        if (target[Matching1[i], Matching1[j]] == 0)
+                        {
+                            unableToCalculate = true;
+                            return int.MaxValue;
+                        }
+                        matrixWithoutMatch[Matching1[i], Matching1[j]] = 0;
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+
+
                 }
             }
 
             var edges = new List<(int from, int to)>();
-            for (var i = 0; i < Size; i++)
+            for (var i = 0; i < target.Size; i++)
             {
-                for (var j = 0; j < Size; j++)
+                isolatedVertices.Add(i);
+                for (var j = 0; j < target.Size; j++)
                 {
                     if (matrixWithoutMatch[i, j] == 1 && !edges.Contains((j, i)))
                     {
@@ -322,14 +398,13 @@ namespace CoreLibrary
                 }
             }
 
-
             if (edges.Count == 0) return 0;
-            var visited = new bool[Size];
+            var visited = new bool[target.Size];
             var queue = new Queue<int>();
             var subgraphsCount = 0;
             while (visited.Contains(false))
             {
-                for (var i = 0; i < Size; i++)
+                for (var i = 0; i < target.Size; i++)
                 {
                     if (visited[i] == false)
                     {
@@ -357,12 +432,217 @@ namespace CoreLibrary
                         }
                     }
                 }
-
-
+            }
+            foreach (var edge in edges)
+            {
+                isolatedVertices.Remove(edge.from);
+                isolatedVertices.Remove(edge.to);
             }
 
-            return subgraphsCount;
+            return subgraphsCount - isolatedVertices.Count;
         }
+
+        public int NumberOfUnconnectedSubgraphsInMatching2(Graph target,out bool unableToCalculate)
+        {
+            unableToCalculate = false;
+            var isolatedVertices = new List<int>();
+            if (Size > target.Size)
+            {
+                unableToCalculate = true;
+                return int.MaxValue;
+            }
+            if (!(target.AdjacencyMatrix.Clone() is int[,] matrixWithoutMatch))
+            {
+                throw new InvalidCastException();
+            }
+
+            for (var i = 0; i < Size; i++)
+            {
+                for (var j = 0; j < Size; j++)
+                {
+                    if (AdjacencyMatrix[i, j] != 1) continue;
+                    try{
+                        if (target[Matching2[i], Matching2[j]] == 0)
+                        {
+                            unableToCalculate = true;
+                            return int.MaxValue;
+                        }
+                        matrixWithoutMatch[Matching2[i], Matching2[j]] = 0;
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+
+
+                }
+            }
+
+            var edges = new List<(int from, int to)>();
+            for (var i = 0; i < target.Size; i++)
+            {
+                isolatedVertices.Add(i);
+                for (var j = 0; j < target.Size; j++)
+                {
+                    if (matrixWithoutMatch[i, j] == 1 && !edges.Contains((j, i)))
+                    {
+                        edges.Add((i, j));
+                    }
+                }
+            }
+
+            if (edges.Count == 0) return 0;
+            var visited = new bool[target.Size];
+            var queue = new Queue<int>();
+            var subgraphsCount = 0;
+            while (visited.Contains(false))
+            {
+                for (var i = 0; i < target.Size; i++)
+                {
+                    if (visited[i] == false)
+                    {
+                        queue.Enqueue(i);
+                        break;
+                    }
+                }
+                subgraphsCount++;
+                while (queue.Count > 0)
+                {
+                    var p = queue.Dequeue();
+                    if (!visited[p])
+                    {
+                        visited[p] = true;
+                        foreach (var edge in edges.FindAll(e => e.from == p || e.to == p))
+                        {
+                            if (edge.from == p && !visited[edge.to])
+                            {
+                                queue.Enqueue(edge.to);
+                            }
+                            else if (!visited[edge.from])
+                            {
+                                queue.Enqueue(edge.from);
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var edge in edges)
+            {
+                isolatedVertices.Remove(edge.from);
+                isolatedVertices.Remove(edge.to);
+            }
+
+            return subgraphsCount - isolatedVertices.Count;
+        }
+
+        //public int NumberOfUnconnectedSubgraphsInMatching(Graph match)
+        //{
+        //    var isolatedVertices = new List<int>();
+        //    if (match.Size > Size) return int.MaxValue;
+        //    if (!(AdjacencyMatrix.Clone() is int[,] matrixWithoutMatch))
+        //    {
+        //        throw new InvalidCastException();
+        //    }
+        //    for (var i = 0; i < match.Size; i++)
+        //    {
+        //        for (var j = 0; j < match.Size; j++)
+        //        {
+        //            if (match[i, j] == 1) matrixWithoutMatch[i, j] = 0;
+        //        }
+        //    }
+
+        //    var edges = new List<(int from, int to)>();
+        //    for (var i = 0; i < Size; i++)
+        //    {
+        //        isolatedVertices.Add(i);
+        //        for (var j = 0; j < Size; j++)
+        //        {
+        //            if (matrixWithoutMatch[i, j] == 1 && !edges.Contains((j, i)))
+        //            {
+        //                edges.Add((i, j));
+        //            }
+        //        }
+        //    }
+
+
+        //    if (edges.Count == 0) return 0;
+        //    var visited = new bool[Size];
+        //    var queue = new Queue<int>();
+        //    var subgraphsCount = 0;
+        //    while (visited.Contains(false))
+        //    {
+        //        for (var i = 0; i < Size; i++)
+        //        {
+        //            if (visited[i] == false)
+        //            {
+        //                queue.Enqueue(i);
+        //                break;
+        //            }
+        //        }
+        //        subgraphsCount++;
+        //        while (queue.Count > 0)
+        //        {
+        //            var p = queue.Dequeue();
+        //            if (!visited[p])
+        //            {
+        //                visited[p] = true;
+        //                foreach (var edge in edges.FindAll(e => e.from == p || e.to == p))
+        //                {
+        //                    if (edge.from == p && !visited[edge.to])
+        //                    {
+        //                        queue.Enqueue(edge.to);
+        //                    }
+        //                    else if (!visited[edge.from])
+        //                    {
+        //                        queue.Enqueue(edge.from);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    foreach (var edge in edges)
+        //    {
+        //        isolatedVertices.Remove(edge.from);
+        //        isolatedVertices.Remove(edge.to);
+        //    }
+
+        //    return subgraphsCount-isolatedVertices.Count;
+        //}
+
+        public void CreateRandomMatching1(Graph g)
+        {
+            Matching1 = new int[Size];
+            var usedVertices = new List<int>();
+            var matchedVerticesCount = 0;
+            while (matchedVerticesCount < Size)
+            {
+                var selectedVertex = GoodRandom.Next(g.Size);
+                while (usedVertices.Contains(selectedVertex))
+                {
+                    selectedVertex = ++selectedVertex % g.Size;
+                }
+                usedVertices.Add(selectedVertex);
+                Matching1[matchedVerticesCount++] = selectedVertex;
+            }
+        }
+
+        public void CreateRandomMatching2(Graph g)
+        {
+            Matching2 = new int[Size];
+            var usedVertices = new List<int>();
+            var matchedVerticesCount = 0;
+            while (matchedVerticesCount < Size)
+            {
+                var selectedVertex = GoodRandom.Next(g.Size);
+                while (usedVertices.Contains(selectedVertex))
+                {
+                    selectedVertex = ++selectedVertex % g.Size;
+                }
+                usedVertices.Add(selectedVertex);
+                Matching2[matchedVerticesCount++] = selectedVertex;
+            }
+        }
+
         public override string ToString()
         {
             var stringBuilder = new StringBuilder();
@@ -439,19 +719,28 @@ namespace CoreLibrary
         {
             var newSize = Size + numberOfVerticesToAdd;
             var newMatrix = new int[newSize, newSize];
+            var newMatching1 = new int[newSize];
+            var newMatching2 = new int[newSize];
             for (var i = 0; i < Size; i++)
             {
+                newMatching1[i] = Matching1[i];
+                newMatching2[i] = Matching2[i];
                 for (var j = 0; j < Size; j++)
                 {
                     newMatrix[i, j] = AdjacencyMatrix[i, j];
                 }
             }
 
+            Matching1 = newMatching1;
+            Matching2 = newMatching2;
             AdjacencyMatrix = newMatrix;
         }
         private void RemoveRandomVertex(int numberOfVerticesToDelete)
         {
             int[,] newMatrix = null;
+            var newSize = Size - numberOfVerticesToDelete;
+            var newMatching1 = new int[newSize];
+            var newMatching2 = new int[newSize];
             var sortedVertices = SortVerticesBasedOnDegree();
             var verticesToDelete = sortedVertices
                 .Take(numberOfVerticesToDelete).ToList();
@@ -460,6 +749,15 @@ namespace CoreLibrary
             {
                 newMatrix = DeleteVertex(AdjacencyMatrix, vertex);
             }
+
+            for (var i = 0; i < newSize; i++)
+            {
+                newMatching1[i] = Matching1[i];
+                newMatching2[i] = Matching2[i];
+            }
+
+            Matching1 = newMatching1;
+            Matching2 = newMatching2;
             AdjacencyMatrix = newMatrix;
         }
         private static int[,] DeleteVertex(int[,] matrix, int index)
