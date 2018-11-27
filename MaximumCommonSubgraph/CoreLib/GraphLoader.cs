@@ -74,8 +74,8 @@ namespace CoreLib
             Console.WriteLine(foundGraph);
 
             var wrapper = InitializeGraphGeneration();
-            SaveGraphAsImage(wrapper, gA, "firstGraph");
-            SaveGraphAsImage(wrapper, gB, "secondGraph");
+            SaveGraphAsImage(wrapper, gA, "firstGraph", edgesFromFirstGraph);
+            SaveGraphAsImage(wrapper, gB, "secondGraph", edgesFromSecondGraph);
             SaveGraphAsImage(wrapper, foundGraph, "result");
         }
 
@@ -101,23 +101,30 @@ namespace CoreLib
                 registerLayoutPluginCommand);
         }
 
-        private static void SaveGraphAsImage(GraphGeneration wrapper,  Graph g, string name)
+        private static void SaveGraphAsImage(GraphGeneration wrapper,  Graph g, string name, List<Edge> edgesToBeMarked = null)
         {
-            string dotLanguage = ConvertToDotLanguage(g, name);
+            string dotLanguage = ConvertToDotLanguage(g, name, edgesToBeMarked);
 
             byte[] output = wrapper.GenerateGraph(dotLanguage, Enums.GraphReturnType.Png);
 
             File.WriteAllBytes($"{name}.png", output);
         }
 
-        private static string ConvertToDotLanguage(Graph g, string name)
+        private static string ConvertToDotLanguage(Graph g, string name, List<Edge> edgesToBeMarked = null)
         {
             var sb = new StringBuilder();
             sb.Append("graph");
             sb.Append("{");
             foreach (var edge in g.Edges)
             {
-                sb.Append($"{edge.v1} -- {edge.v2}; ");
+                if (edgesToBeMarked != null && edgesToBeMarked.Contains(edge))
+                {
+                    sb.Append($"{edge.v1} -- {edge.v2} [color = \"red\"]; ");
+                }
+                else
+                {
+                    sb.Append($"{edge.v1} -- {edge.v2}; ");
+                }
             }
 
             sb.Append("}");
