@@ -34,7 +34,7 @@ namespace GeneticAlgorithm
                 _generation.Sort((graph1, graph2) => graph1.Score.CompareTo(graph2.Score));
                 if (_generation.First().Score > best.Score) best = _generation.First().Clone();
                 KillHalfOfTheGeneration();
-                var babies=MakeBabies();
+                var babies=MakeBabies(g1,g2);
                 _generation.AddRange(babies);
                 ApplyMutation();
                 var newGenerationScore = CalculateGenerationScore();
@@ -68,11 +68,12 @@ namespace GeneticAlgorithm
         {
             foreach (var graph in _generation)
             {
+                var sizebefore = graph.Size;
                 graph.Mutate();
             }
         }
 
-        private List<Graph> MakeBabies()
+        private List<Graph> MakeBabies(Graph g1, Graph g2)
         {
             var babies = new List<Graph>();
             var minScore = _generation.Min(graph => graph.Score);
@@ -90,7 +91,7 @@ namespace GeneticAlgorithm
             {
                 var fatherIndex = SelectParentIndex(null);
                 var motherIndex = SelectParentIndex(fatherIndex);
-                var babyGraph = Graph.CreateChild(_generation[motherIndex], _generation[fatherIndex]);
+                var babyGraph = Graph.CreateChild(_generation[motherIndex], _generation[fatherIndex], g1.Size, g2.Size);
                 babies.Add(babyGraph);
             }
 

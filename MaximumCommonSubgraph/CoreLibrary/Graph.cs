@@ -152,12 +152,16 @@ namespace CoreLibrary
             return new Graph(matrix);
         }
 
-        public static Graph CreateChild(Graph mother, Graph father)
+        public static Graph CreateChild(Graph mother, Graph father, int g1, int g2)
         {
             var childSize = (mother.Size + father.Size) / 2;
             if ((mother.Size + father.Size) % 2 == 1 && GoodRandom.Bool()) childSize++;
+            if (childSize > g1 || childSize > g2)
+            {
+                childSize = g1 > g2 ? g1 : g2;
+            }
             var child = new int[childSize, childSize];
-            var (childMatching1, childMatching2) = InheritMatching(mother, father,childSize); 
+            var (childMatching1, childMatching2) = InheritMatching(mother, father,childSize,g1,g2); 
             var decision = false;
             for (var i = 0; i < childSize; i++)
             {
@@ -203,7 +207,8 @@ namespace CoreLibrary
             };
         }
 
-        private static (int[] matching1, int[] matching2) InheritMatching(Graph mother, Graph father, int childSize)
+        private static (int[] matching1, int[] matching2) InheritMatching(Graph mother, Graph father, int childSize,
+            int g1, int g2)
         {
             var smallerParentSize = mother.Size > father.Size ? father.Size : mother.Size;
             var matching1 = new int[childSize];
@@ -243,7 +248,33 @@ namespace CoreLibrary
                 }
             }
 
+            FixMatching(ref matching1, g1);
+            FixMatching(ref matching2, g2);
             return (matching1, matching2);
+        }
+
+        private static void FixMatching(ref int[] matching, int g)
+        {
+            var usedVertices = new List<int>();
+            foreach (var vertex in matching)
+            {
+                var target = vertex;
+                if (!usedVertices.Contains(target))
+                {
+                    usedVertices.Add(target);
+                }
+                else
+                {
+                    while (usedVertices.Contains(target))
+                    {
+                        target = ++target % g;
+                    }
+
+                    usedVertices.Add(target);
+                }
+            }
+
+            matching = usedVertices.ToArray();
         }
 
         #endregion
@@ -737,7 +768,7 @@ namespace CoreLibrary
         }
         private void RemoveRandomVertex(int numberOfVerticesToDelete)
         {
-            int[,] newMatrix = null;
+            var newMatrix = AdjacencyMatrix;
             var newSize = Size - numberOfVerticesToDelete;
             var newMatching1 = new int[newSize];
             var newMatching2 = new int[newSize];
@@ -747,7 +778,7 @@ namespace CoreLibrary
             verticesToDelete.Sort((v1, v2) => -v1.CompareTo(v2));
             foreach (var vertex in verticesToDelete)
             {
-                newMatrix = DeleteVertex(AdjacencyMatrix, vertex);
+                newMatrix = DeleteVertex(newMatrix, vertex);
             }
 
             for (var i = 0; i < newSize; i++)
