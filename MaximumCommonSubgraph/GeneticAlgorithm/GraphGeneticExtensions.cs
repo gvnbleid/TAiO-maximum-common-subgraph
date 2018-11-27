@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CoreLibrary;
+using CoreLib;
 
 namespace GeneticAlgorithm
 {
@@ -11,9 +11,9 @@ namespace GeneticAlgorithm
     {
         public static void Mutate(this Graph g)
         {
-            var vertexProbability = CoreLibrary.GoodRandom.Next(100);
-            var edgeProbability = CoreLibrary.GoodRandom.Next(100);
-            var signDecision = CoreLibrary.GoodRandom.Bool();
+            var vertexProbability = GoodRandom.Next(100);
+            var edgeProbability = GoodRandom.Next(100);
+            var signDecision = GoodRandom.Bool();
             var sign = signDecision ? -1 : 1;
             var vertexChange = GetChange(vertexProbability);
             var edgeChange = GetChange(edgeProbability);
@@ -124,7 +124,7 @@ namespace GeneticAlgorithm
             {
                 for (var i = 0; i < numberOfEdgesToAdd; i++)
                 {
-                    var edge = possibleEdges[CoreLibrary.GoodRandom.Next(possibleEdges.Count)];
+                    var edge = possibleEdges[GoodRandom.Next(possibleEdges.Count)];
                     g.AdjacencyMatrix[edge.v1, edge.v2] = 1;
                     g.AdjacencyMatrix[edge.v2, edge.v1] = 1;
                     possibleEdges.Remove(edge);
@@ -139,7 +139,7 @@ namespace GeneticAlgorithm
             {
                 for (var i = 0; i < numberOfEdgesToRemove; i++)
                 {
-                    var edge = edges[CoreLibrary.GoodRandom.Next(edges.Count)];
+                    var edge = edges[GoodRandom.Next(edges.Count)];
                     g.AdjacencyMatrix[edge.v1, edge.v2] = 0;
                     g.AdjacencyMatrix[edge.v2, edge.v1] = 0;
                     edges.Remove(edge);
@@ -232,13 +232,13 @@ namespace GeneticAlgorithm
         }
         public static Graph CreateRandomGraph(int maxSize)
         {
-            var size = CoreLibrary.GoodRandom.Next(maxSize) + 1;
+            var size = GoodRandom.Next(maxSize) + 1;
             var matrix = new int[size, size];
             for (var i = 0; i < size; i++)
             {
                 for (var j = 0; j < i; j++)
                 {
-                    if (CoreLibrary.GoodRandom.Bool())
+                    if (GoodRandom.Bool())
                     {
                         matrix[i, j] = 1;
                         matrix[j, i] = 1;
@@ -252,7 +252,7 @@ namespace GeneticAlgorithm
         public static Graph CreateChild(Graph mother, Graph father)
         {
             var childSize = (mother.Size + father.Size) / 2;
-            if ((mother.Size + father.Size) % 2 == 1 && CoreLibrary.GoodRandom.Bool()) childSize++;
+            if ((mother.Size + father.Size) % 2 == 1 && GoodRandom.Bool()) childSize++;
             var child = new int[childSize, childSize];
             var decision = false;
             for (var i = 0; i < childSize; i++)
@@ -263,7 +263,7 @@ namespace GeneticAlgorithm
                     switch (edgeExistance)
                     {
                         case 0:
-                            decision = CoreLibrary.GoodRandom.Next(100) < 1;
+                            decision = GoodRandom.Next(100) < 1;
                             if (decision)
                             {
                                 child[i, j] = 1;
@@ -271,7 +271,7 @@ namespace GeneticAlgorithm
                             }
                             break;
                         case 1:
-                            decision = CoreLibrary.GoodRandom.Next(100) < 49;
+                            decision = GoodRandom.Next(100) < 49;
                             if (decision)
                             {
                                 child[i, j] = 1;
@@ -279,7 +279,7 @@ namespace GeneticAlgorithm
                             }
                             break;
                         case 2:
-                            decision = CoreLibrary.GoodRandom.Next(100) < 98;
+                            decision = GoodRandom.Next(100) < 98;
                             if (decision)
                             {
                                 child[i, j] = 1;

@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McGregor", "McGregor\McGreg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticAlgorithm", "GeneticAlgorithm\GeneticAlgorithm.csproj", "{C34F9CE6-A16F-4A7B-BBA0-7AA0221CD27C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreLibrary", "CoreLibrary\CoreLibrary.csproj", "{BD23023E-A827-4B1B-923F-CEE062C303BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreLib", "CoreLib\CoreLib.csproj", "{A2FCFF75-2554-470B-9AD1-63C31747A39F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{C34F9CE6-A16F-4A7B-BBA0-7AA0221CD27C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C34F9CE6-A16F-4A7B-BBA0-7AA0221CD27C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C34F9CE6-A16F-4A7B-BBA0-7AA0221CD27C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD23023E-A827-4B1B-923F-CEE062C303BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD23023E-A827-4B1B-923F-CEE062C303BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD23023E-A827-4B1B-923F-CEE062C303BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD23023E-A827-4B1B-923F-CEE062C303BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2FCFF75-2554-470B-9AD1-63C31747A39F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2FCFF75-2554-470B-9AD1-63C31747A39F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2FCFF75-2554-470B-9AD1-63C31747A39F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2FCFF75-2554-470B-9AD1-63C31747A39F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

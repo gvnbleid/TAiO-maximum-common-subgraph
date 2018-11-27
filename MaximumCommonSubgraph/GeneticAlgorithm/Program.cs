@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using CoreLibrary;
+using CoreLib;
 
 namespace GeneticAlgorithm
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using CoreLibrary;
+using CoreLib;
 using Priority_Queue;
 
 namespace CliqueHeuristic
