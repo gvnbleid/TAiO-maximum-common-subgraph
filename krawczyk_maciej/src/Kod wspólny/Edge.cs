@@ -1,4 +1,6 @@
-﻿namespace CoreLib
+﻿using System;
+
+namespace CoreLib
 {
     public class Edge
     {

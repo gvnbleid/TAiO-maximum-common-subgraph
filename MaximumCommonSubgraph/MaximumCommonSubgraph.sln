@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticAlgorithm", "Genetic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreLib", "CoreLib\CoreLib.csproj", "{A2FCFF75-2554-470B-9AD1-63C31747A39F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphGenerator", "GraphGenerator\GraphGenerator.csproj", "{858F67AD-4CD7-4CE7-8B93-456A1DCB67EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A2FCFF75-2554-470B-9AD1-63C31747A39F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2FCFF75-2554-470B-9AD1-63C31747A39F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2FCFF75-2554-470B-9AD1-63C31747A39F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{858F67AD-4CD7-4CE7-8B93-456A1DCB67EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{858F67AD-4CD7-4CE7-8B93-456A1DCB67EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{858F67AD-4CD7-4CE7-8B93-456A1DCB67EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{858F67AD-4CD7-4CE7-8B93-456A1DCB67EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
